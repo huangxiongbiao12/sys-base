@@ -240,8 +240,11 @@ public class Generator {
                 File file = new File(targetFile);
                 if (!file.getParentFile().exists())
                     file.getParentFile().mkdirs();
-                if (!file.exists())
+                if (!file.exists()) {
                     file.createNewFile();
+                } else {
+                    continue;
+                }
 
                 FileOutputStream outStream = new FileOutputStream(file);
                 OutputStreamWriter writer = new OutputStreamWriter(outStream,
@@ -297,8 +300,11 @@ public class Generator {
                 File file = new File(targetFile);
                 if (!file.getParentFile().exists())
                     file.getParentFile().mkdirs();
-                if (!file.exists())
+                if (!file.exists()) {
                     file.createNewFile();
+                } else {
+                    continue;
+                }
 
                 FileOutputStream outStream = new FileOutputStream(file);
                 OutputStreamWriter writer = new OutputStreamWriter(outStream,
@@ -355,9 +361,11 @@ public class Generator {
                 File file = new File(targetFile);
                 if (!file.getParentFile().exists())
                     file.getParentFile().mkdirs();
-                if (!file.exists())
+                if (!file.exists()) {
                     file.createNewFile();
-
+                } else {
+                    continue;
+                }
                 FileOutputStream outStream = new FileOutputStream(file);
                 OutputStreamWriter writer = new OutputStreamWriter(outStream,
                         "UTF-8");
@@ -379,7 +387,63 @@ public class Generator {
      * 生成controller
      */
     private static void generateController() {
+        try {
+            resultSet.beforeFirst();
+            //迭代所有的表  daoPackage tableRemake domainName upperDomainName
+            while (resultSet.next()) {
+                //表名
+                String tableName = resultSet.getString("TABLE_NAME");
+                String tableRemake = resultSet.getString("REMARKS");
+                String domainName = initialCap(tableName);
+                String servicePackage = Generator.servicePackage;
+                //创建mapper文件
+                if (getControllerSavePath() == null) break;
+                String targetFile = getControllerSavePath() + domainName + "Controller.java";
 
+                Properties pro = new Properties();
+                pro.setProperty(Velocity.OUTPUT_ENCODING, "UTF-8");
+                pro.setProperty(Velocity.INPUT_ENCODING, "UTF-8");
+                pro.setProperty(Velocity.RESOURCE_LOADER, "class");
+                //可选值："class"--从classpath中读取，"file"--从文件系统中读取
+                pro.setProperty(Velocity.RESOURCE_LOADER, "class");
+                //如果从文件系统中读取模板，那么属性值为org.apache.velocity.runtime.resource.loader.FileResourceLoader
+                pro.setProperty("class.resource.loader.class", "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
+                VelocityEngine ve = new VelocityEngine(pro);
+
+                VelocityContext context = new VelocityContext();
+                context.put("servicePackage", servicePackage);
+                context.put("controllerPackage", controllerPackage);
+                context.put("entityPackage", entityPackage);
+                context.put("tableRemake", tableRemake);
+                context.put("domainName", domainName);
+                context.put("mapping", domainName.replace("_", "-"));
+                context.put("daoPackage", daoPackage);
+                context.put("attrName", columnName2AttrName(domainName));
+                Template t = ve.getTemplate("template/controller.template", "UTF-8");
+
+                File file = new File(targetFile);
+                if (!file.getParentFile().exists())
+                    file.getParentFile().mkdirs();
+                if (!file.exists()) {
+                    file.createNewFile();
+                } else {
+                    continue;
+                }
+                FileOutputStream outStream = new FileOutputStream(file);
+                OutputStreamWriter writer = new OutputStreamWriter(outStream,
+                        "UTF-8");
+                BufferedWriter sw = new BufferedWriter(writer);
+                t.merge(context, sw);
+                sw.flush();
+                sw.close();
+                outStream.close();
+                System.out.println("成功生成Java文件:" + (targetFile).replaceAll("/", "\\\\"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 

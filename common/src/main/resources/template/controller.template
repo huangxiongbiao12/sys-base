@@ -1,0 +1,44 @@
+package $!{controllerPackage};
+
+import $!{entityPackage}.$!{domainName}Entity;
+import $!{servicePackage}.$!{domainName}Service;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("$!{mapping}")
+public class $!{domainName}Controller {
+
+    @Autowired
+    $!{domainName}Service $!{attrName}Service;
+
+
+    @RequestMapping("save")
+    public void save($!{domainName}Entity entity) {
+        $!{attrName}Service.insert(entity);
+    }
+
+    @RequestMapping("delete")
+    public void deleteById(String id) {
+        $!{attrName}Service.deleteById(id);
+    }
+
+    @RequestMapping("update")
+    public void update($!{domainName}Entity entity) {
+        $!{attrName}Service.update(entity);
+    }
+
+    @RequestMapping("get-by-id")
+    public $!{domainName}Entity getById(String id) {
+        return $!{attrName}Service.getById(id);
+    }
+
+    @RequestMapping("list")
+    public List<$!{domainName}Entity> list() {
+        return $!{attrName}Service.getAll();
+    }
+
+}
