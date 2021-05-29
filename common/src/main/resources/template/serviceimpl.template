@@ -1,0 +1,17 @@
+package $!{servicePackage}.impl;
+
+import $!{daoPackage}.$!{domainName}Dao;
+import $!{entityPackage}.$!{domainName}Entity;
+import com.rm.common.service.impl.BaseServiceImpl;
+import $!{servicePackage}.$!{domainName}Service;
+import org.springframework.stereotype.Service;
+
+/**
+ *
+ *   $!{tableRemake}
+ *
+ */
+@Service
+public class $!{domainName}ServiceImpl extends BaseServiceImpl<$!{domainName}Entity, $!{domainName}Dao> implements $!{domainName}Service {
+
+}

@@ -1,0 +1,11 @@
+package $!{servicePackage};
+
+import com.rm.common.service.BaseService;
+import $!{entityPackage}.$!{domainName}Entity;
+
+/**
+ * $!{tableRemake}
+ */
+public interface $!{domainName}Service extends BaseService<$!{domainName}Entity> {
+
+}
