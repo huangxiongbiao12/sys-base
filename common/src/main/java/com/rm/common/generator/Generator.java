@@ -212,7 +212,7 @@ public class Generator {
                 String tableName = resultSet.getString("TABLE_NAME");
                 String tableRemake = resultSet.getString("REMARKS");
                 String domainName = initialCap(tableName);
-                String upperDomainName = domainName.toUpperCase();
+                String upperDomainName = tableName.toUpperCase();
                 String daoPackage = Generator.daoPackage;
                 //创建mapper文件
                 if (getDaoSavePath() == null) break;
