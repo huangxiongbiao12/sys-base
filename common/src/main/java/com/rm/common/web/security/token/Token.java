@@ -3,17 +3,21 @@ package com.rm.common.web.security.token;
 
 import com.rm.common.web.security.annotation.Access;
 import com.rm.common.web.security.annotation.RefuseAccess;
+import com.rm.common.web.security.config.EPlatform;
 import com.rm.common.web.security.config.RmSecurityProperties;
+import lombok.Data;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 
 /**
  * Created by Administrator on 2017/8/14.
  */
+@Data
 public class Token implements Serializable {
 
     private static final long serialVersionUID = -7195818219149330529L;
@@ -32,39 +36,21 @@ public class Token implements Serializable {
 
     private String uuid;
 
+    private LocalDateTime ctime;
+
+    private EPlatform platform = EPlatform.Any;
+
     private Set<String> signSet;
 
     public Token() {
     }
 
-    public Token(String userId, String uuid, Set<String> signSet) {
+    public Token(String userId, String uuid, EPlatform platform, Set<String> signSet) {
         this.userId = userId;
         this.uuid = uuid;
         this.signSet = signSet;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    public String getUuid() {
-        return uuid;
-    }
-
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
-    }
-
-    public Set<String> getSignSet() {
-        return signSet;
-    }
-
-    public void setSignSet(Set<String> signSet) {
-        this.signSet = signSet;
+        this.ctime = LocalDateTime.now();
+        this.platform = platform;
     }
 
 
@@ -117,6 +103,7 @@ public class Token implements Serializable {
 
     /**
      * 根据请求的path和方法，判断是都拥有改方法权限
+     *
      * @param path
      * @param method
      * @param rmSecurityProperties
@@ -135,19 +122,15 @@ public class Token implements Serializable {
     }
 
 
-    @Override
-    public boolean equals(Object that) {
-        if (that != null
-                && that instanceof Token) {
-            return this.getUuid().equals(((Token) that).getUuid())
-                    && this.getUserId().equals(((Token) that).getUserId());
-        }
-        return false;
+    public boolean equals(Token token) {
+        return this.getUuid().equals(token.getUuid())
+                && this.getUserId().equals(token.getUserId())
+                && this.getPlatform().equals(token.getPlatform());
     }
 
     @Override
     public String toString() {
-        return this.userId + TOKEN_SPLIT + this.uuid;
+        return this.userId + TOKEN_SPLIT + this.uuid + TOKEN_SPLIT + this.platform.toString();
     }
 
 }

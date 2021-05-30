@@ -16,9 +16,20 @@ public enum EPlatform {
     Windows("Windows"),
     Others("Others");
 
-    private EPlatform(String desc){
+    EPlatform(String desc){
         this.description = desc;
     }
+
+
+//    public EPlatform valuesOf(String des) {
+//        EPlatform[] values = EPlatform.values();
+//        for (EPlatform plat : values) {
+//            if (plat.description.equals(des)) {
+//                return plat;
+//            }
+//        }
+//        return EPlatform.Others;
+//    }
 
     public String toString(){
         return description;

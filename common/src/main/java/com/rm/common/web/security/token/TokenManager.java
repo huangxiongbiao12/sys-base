@@ -32,9 +32,9 @@ public class TokenManager {
      * @param userId 用户Id
      * @return 创建好的token
      */
-    public Token create(String userId, Set<String> signSet) {
-        String key = getKey(userId);
-        Token token = new Token(userId, IdGenerator.uuid(), signSet);
+    public Token create(String userId, EPlatform platform, Set<String> signSet) {
+        String key = getKey(userId, platform);
+        Token token = new Token(userId, IdGenerator.uuid(), platform, signSet);
         cacheService.set(key, token, rmSecurityProperties.getExpireTime(), rmSecurityProperties.getTimeUnit());
         return token;
     }
@@ -42,21 +42,11 @@ public class TokenManager {
     /**
      * 根据用户id删除token
      *
-     * @param userId 用户id
+     * @param token 用户id
      */
-    public void delete(String userId) {
-        String key = getKey(userId);
+    public void delete(Token token) {
+        String key = getKey(token.getUserId(), token.getPlatform());
         cacheService.remove(key);
-    }
-
-    /**
-     * 根据用户id，取得token
-     *
-     * @param userId 用户id
-     * @return
-     */
-    public Token get(String userId) {
-        return (Token) cacheService.get(getKey(userId));
     }
 
     /**
@@ -68,8 +58,8 @@ public class TokenManager {
     public Token parse(String tokenString) {
         if (StringUtils.hasText(tokenString)) {
             String[] csv = tokenString.split(Token.TOKEN_SPLIT);
-            if (csv.length == 2) {
-                return new Token(csv[0], csv[1], null);
+            if (csv.length == 3) {
+                return new Token(csv[0], csv[1], EPlatform.valueOf(csv[2]), null);
             }
         }
         return null;
@@ -83,8 +73,9 @@ public class TokenManager {
      */
     public Token check(Token token) {
         if (token != null) {
-            String key = getKey(token.getUserId());
+            String key = getKey(token.getUserId(), token.getPlatform());
             Token cached = (Token) cacheService.get(key);
+            // todo  过期时间判断 过期删除
             if (cached != null && cached.getUuid().equals(token.getUuid()) && cached.equals(token)) {
                 //延长过期时间
                 cacheService.expire(key,
@@ -102,10 +93,6 @@ public class TokenManager {
      * @param userId
      * @return
      */
-    private String getKey(String userId) {
-        return getKey(userId, EPlatform.Any);
-    }
-
     private String getKey(String userId, EPlatform platform) {
         return Token.HEADER_TOKEN + ":" + platform.getDescription() + ":" + userId;
     }
