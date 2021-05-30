@@ -1,0 +1,153 @@
+package com.rm.common.web.security.token;
+
+
+import com.rm.common.web.security.annotation.Access;
+import com.rm.common.web.security.annotation.RefuseAccess;
+import com.rm.common.web.security.config.RmSecurityProperties;
+import org.apache.commons.lang3.ArrayUtils;
+
+import java.io.Serializable;
+import java.lang.reflect.Method;
+import java.util.Set;
+
+
+/**
+ * Created by Administrator on 2017/8/14.
+ */
+public class Token implements Serializable {
+
+    private static final long serialVersionUID = -7195818219149330529L;
+
+    /**
+     * Header中存储token的字段的key
+     */
+    public static final String HEADER_TOKEN = "token";
+
+    /**
+     * token分割符  asccii 分组符
+     */
+    public static final String TOKEN_SPLIT = Character.toString((char) 29);
+
+    private String userId;
+
+    private String uuid;
+
+    private Set<String> signSet;
+
+    public Token() {
+    }
+
+    public Token(String userId, String uuid, Set<String> signSet) {
+        this.userId = userId;
+        this.uuid = uuid;
+        this.signSet = signSet;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
+
+    public Set<String> getSignSet() {
+        return signSet;
+    }
+
+    public void setSignSet(Set<String> signSet) {
+        this.signSet = signSet;
+    }
+
+
+    /**
+     * 校验权限，即所请求的接口是否在当前token所拥有的权限列表中
+     * 包含其中一个标识，即可访问
+     *
+     * @param signArr 权限标识
+     * @return 校验结果
+     */
+    public boolean confirmSign(String... signArr) {
+        if (signArr == null) return true;
+        for (String sign : signArr) {
+            if (this.signSet != null && this.signSet.contains(sign)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 包含其中一个标识,及不可访问
+     *
+     * @param signArr 权限标识
+     * @return
+     */
+    public boolean refuseSign(String... signArr) {
+        if (signArr == null) return true;
+        return !confirmSign(signArr);
+    }
+
+    /**
+     * 两者冲突一sign内可访问为准
+     *
+     * @param sign    拥有即可访问
+     * @param disSign 拥有即不能访问
+     * @return
+     */
+    public boolean confirm(String[] sign, String[] disSign) {
+        if (sign == null && disSign == null) {
+            return true;
+        } else if (sign == null && disSign != null) {
+            return refuseSign(disSign);
+        } else if (sign != null && disSign == null) {
+            return confirmSign(sign);
+        } else {
+            return confirmSign(sign);
+        }
+    }
+
+    /**
+     * 根据请求的path和方法，判断是都拥有改方法权限
+     * @param path
+     * @param method
+     * @param rmSecurityProperties
+     * @return
+     */
+    public boolean confirm(String path, Method method, RmSecurityProperties rmSecurityProperties) {
+        Access accessAnnotation = method.getAnnotation(Access.class);
+        RefuseAccess refuseAccessAnnotation = method.getAnnotation(RefuseAccess.class);
+        String[] permissions = accessAnnotation != null ? accessAnnotation.identify() : null;
+        String[] refusePermissions = refuseAccessAnnotation != null ? refuseAccessAnnotation.identify() : null;
+        String[] permissionsProperties = rmSecurityProperties.getPerssions().get(path);
+        String[] refusePermissionsProperties = rmSecurityProperties.getRefusePerssions().get(path);
+        permissions = ArrayUtils.addAll(permissions, permissionsProperties);
+        refusePermissions = ArrayUtils.addAll(refusePermissions, refusePermissionsProperties);
+        return confirm(permissions, refusePermissions);
+    }
+
+
+    @Override
+    public boolean equals(Object that) {
+        if (that != null
+                && that instanceof Token) {
+            return this.getUuid().equals(((Token) that).getUuid())
+                    && this.getUserId().equals(((Token) that).getUserId());
+        }
+        return false;
+    }
+
+    @Override
+    public String toString() {
+        return this.userId + TOKEN_SPLIT + this.uuid;
+    }
+
+}

@@ -416,7 +416,7 @@ public class Generator {
                 context.put("entityPackage", entityPackage);
                 context.put("tableRemake", tableRemake);
                 context.put("domainName", domainName);
-                context.put("mapping", domainName.replace("_", "-"));
+                context.put("mapping", tableName.replace("_", "-"));
                 context.put("daoPackage", daoPackage);
                 context.put("attrName", columnName2AttrName(domainName));
                 Template t = ve.getTemplate("template/controller.template", "UTF-8");

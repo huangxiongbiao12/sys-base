@@ -5,7 +5,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 @ConfigurationProperties(
-        prefix = "code.generator"
+        prefix = "rm.generator"
 )
 @Component
 public class GeneratorProperties {
