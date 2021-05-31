@@ -1,5 +1,6 @@
 package com.rm.common.web.security.annotation;
 
+import com.rm.common.cache.CacheConfig;
 import com.rm.common.web.security.config.RmSecurityProperties;
 import com.rm.common.web.security.config.WebConfigration;
 import com.rm.common.web.security.interceptor.AuthInterceptor;
@@ -13,6 +14,6 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-@Import({RmSecurityProperties.class, WebConfigration.class, AuthInterceptor.class, TokenManager.class})
+@Import({RmSecurityProperties.class, WebConfigration.class, AuthInterceptor.class, TokenManager.class, CacheConfig.class})
 public @interface EnableSecurity {
 }

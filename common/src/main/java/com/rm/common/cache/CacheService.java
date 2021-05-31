@@ -10,7 +10,7 @@ public interface CacheService {
      * @param value
      * @return
      */
-    boolean set(final String key, Object value);
+    void set(final String key, Object value);
 
 
     /**
