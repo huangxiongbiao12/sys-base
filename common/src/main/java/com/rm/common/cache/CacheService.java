@@ -1,8 +1,6 @@
 package com.rm.common.cache;
 
 
-import java.util.concurrent.TimeUnit;
-
 public interface CacheService {
 
     /**
@@ -13,28 +11,6 @@ public interface CacheService {
      * @return
      */
     boolean set(final String key, Object value);
-
-    /**
-     * 写入缓存设置时效时间
-     *
-     * @param key
-     * @param value
-     * @return
-     */
-    boolean set(final String key, Object value, Long expireTime);
-
-
-    boolean set(final String key, Object value, Long expireTime, TimeUnit unit);
-
-    /**
-     * 延长key的有效时间
-     *
-     * @param key
-     * @param expireTime
-     * @param unit
-     * @return
-     */
-    boolean expire(String key, Long expireTime, TimeUnit unit);
 
 
     /**

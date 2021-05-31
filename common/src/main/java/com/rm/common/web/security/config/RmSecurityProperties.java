@@ -49,7 +49,7 @@ public class RmSecurityProperties {
     private Map<String, String[]> refusePerssions = new HashMap<>();
 
     /**
-     * 不需要鉴权的path集合
+     * 不需要鉴权的path集合  正则表达式
      *
      */
     private String[] disauth = {};

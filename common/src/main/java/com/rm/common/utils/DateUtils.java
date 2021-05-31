@@ -6,10 +6,12 @@ import org.apache.log4j.Logger;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -1379,6 +1381,57 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
         return value;
 
     }
+
+    public static TimeUnit convert(ChronoUnit tu) {
+        if (tu == null) {
+            return null;
+        }
+        switch (tu) {
+            case DAYS:
+                return TimeUnit.DAYS;
+            case HOURS:
+                return TimeUnit.HOURS;
+            case MINUTES:
+                return TimeUnit.MINUTES;
+            case SECONDS:
+                return TimeUnit.SECONDS;
+            case MICROS:
+                return TimeUnit.MICROSECONDS;
+            case MILLIS:
+                return TimeUnit.MILLISECONDS;
+            case NANOS:
+                return TimeUnit.NANOSECONDS;
+            default:
+                //TODO support the rest
+                throw new UnsupportedOperationException("Man, use a real temporal unit");
+        }
+    }
+
+    public static ChronoUnit convert(TimeUnit tu) {
+        if (tu == null) {
+            return null;
+        }
+        switch (tu) {
+            case DAYS:
+                return ChronoUnit.DAYS;
+            case HOURS:
+                return ChronoUnit.HOURS;
+            case MINUTES:
+                return ChronoUnit.MINUTES;
+            case SECONDS:
+                return ChronoUnit.SECONDS;
+            case MICROSECONDS:
+                return ChronoUnit.MICROS;
+            case MILLISECONDS:
+                return ChronoUnit.MILLIS;
+            case NANOSECONDS:
+                return ChronoUnit.NANOS;
+            default:
+                assert false : "there are no other TimeUnit ordinal values";
+                return null;
+        }
+    }
+
 
     public static void main(String[] args) {
         Date date3 = DateUtils.addMinute(new Date(), 5);

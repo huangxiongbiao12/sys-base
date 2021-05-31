@@ -1,10 +1,11 @@
 package com.rm.common.web.security.interceptor;
 
+import com.rm.common.utils.CollectionUtils;
 import com.rm.common.web.security.annotation.Disauth;
 import com.rm.common.web.security.config.RmSecurityProperties;
 import com.rm.common.web.security.token.Token;
 import com.rm.common.web.security.token.TokenManager;
-import org.apache.commons.lang3.ArrayUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
@@ -20,6 +21,7 @@ import java.lang.reflect.Method;
  * 登陆鉴权拦截器
  */
 @Component
+@Slf4j
 public class AuthInterceptor extends HandlerInterceptorAdapter {
 
     @Autowired
@@ -36,7 +38,7 @@ public class AuthInterceptor extends HandlerInterceptorAdapter {
             response.setHeader("Access-Control-Allow-Headers", "*");
             response.setHeader("Access-Control-Exposed-Headers", Token.HEADER_TOKEN);
             Method method = ((HandlerMethod) handler).getMethod();
-            System.out.println(method.getName());
+            log.info(method.getName());
             if ("error".equals(method.getName())) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 return true;
@@ -48,7 +50,7 @@ public class AuthInterceptor extends HandlerInterceptorAdapter {
             //如果标注了Disauth或者配置文件disauth中存在path，则直接返回成功
             if (method.getDeclaringClass().getAnnotation(Disauth.class) != null
                     || method.getAnnotation(Disauth.class) != null
-                    || ArrayUtils.contains(rmSecurityProperties.getDisauth(), path)) {
+                    || checkDisauth(path)) {
                 return true;
             }
             Token token = tokenManager.parse(request.getHeader(Token.HEADER_TOKEN));
@@ -64,6 +66,23 @@ public class AuthInterceptor extends HandlerInterceptorAdapter {
             //因为return的是false，所以直接记录日志
         } else if ("OPTIONS".equals(request.getMethod())) {
             return true;
+        }
+        return false;
+    }
+
+    /**
+     * 正则匹配
+     *
+     * @return
+     */
+    private boolean checkDisauth(String path) {
+        String[] disauths = rmSecurityProperties.getDisauth();
+        if (!CollectionUtils.isEmpty(disauths)) {
+            for (String authPattern : disauths) {
+                if (path.matches(authPattern)) {
+                    return true;
+                }
+            }
         }
         return false;
     }
