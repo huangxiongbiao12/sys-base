@@ -2,20 +2,20 @@
 <configuration>
     <jdbc>
         <!-- 配置需要的数据库的驱动，本例采用postgres -->
-        <driver>com.mysql.jdbc.Driver</driver>
+        <driver>com.mysql.cj.jdbc.Driver</driver>
         <!-- 配置数据库地址 -->
-        <url>jdbc:mysql://106.12.3.68:3306/dongbang?characterEncoding=UTF-8</url>
+        <url>jdbc:mysql://localhost:3306/sys_base?characterEncoding=UTF-8</url>
         <!-- 配置数据库用户名-->
-        <user>medi</user>
+        <user>root</user>
         <!-- 配置数据库密码-->
-        <password>medishare2019</password>
+        <password>11111111</password>
     </jdbc>
     <generator>
         <!-- 代码生成器 -->
         <name>org.jooq.codegen.JavaGenerator</name>
         <database>
             <!--强制为scheme1模式下所有的含有id域生成id-->
-            <syntheticPrimaryKeys>dongbang\..*\.id</syntheticPrimaryKeys>
+            <syntheticPrimaryKeys>sys_base\..*\.id</syntheticPrimaryKeys>
             <!--是否重写主键-->
             <overridePrimaryKeys>override_primmary_key</overridePrimaryKeys>
             <name>org.jooq.meta.jdbc.JDBCDatabase</name>
@@ -24,7 +24,7 @@
             <includes>.*</includes>
             <!--<excludes></excludes>-->
             <!--数据库名称-->
-            <inputSchema>dongbang</inputSchema>
+            <inputSchema>sys_base</inputSchema>
         </database>
 
         <generate>
