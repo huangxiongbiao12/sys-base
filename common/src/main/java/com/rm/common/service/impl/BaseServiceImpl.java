@@ -1,10 +1,12 @@
 package com.rm.common.service.impl;
 
 import com.rm.common.jooq.BasicDao;
+import com.rm.common.jooq.Paging;
 import com.rm.common.service.BaseService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @param <P>   数据库实体
@@ -40,4 +42,10 @@ public abstract class BaseServiceImpl<P, DAO extends BasicDao> implements BaseSe
     public List<P> getAll() {
         return dao.findAll();
     }
+
+    @Override
+    public List<P> listConditionPage(Map map, Paging paging) {
+        return dao.listConditionPage(map, paging);
+    }
+
 }

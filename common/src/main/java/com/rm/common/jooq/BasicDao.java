@@ -2,10 +2,12 @@ package com.rm.common.jooq;
 
 import org.jooq.*;
 import org.jooq.impl.DAOImpl;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
+import java.util.Map;
 
 public class BasicDao<R extends UpdatableRecord<R>, P extends BasicEntity, Tab extends Table<R>>
         extends DAOImpl<R, P, String> {
@@ -36,6 +38,20 @@ public class BasicDao<R extends UpdatableRecord<R>, P extends BasicEntity, Tab e
         }
         super.insert(object);
     }
+
+    /**
+     * 根据条件组装分页查询
+     *
+     * @param map
+     * @param paging
+     * @return
+     */
+    public List<P> listConditionPage(Map map, Paging paging) {
+        Condition condition = ConditionUtils.parseMap(map);
+        SelectConditionStep<Record> selectConditionStep = this.ctx().select().from(t).where(condition);
+        return selectByPageAndCount(selectConditionStep, paging, getType());
+    }
+
 
     /**
      * 分页查询
