@@ -49,6 +49,7 @@ public class BasicDao<R extends UpdatableRecord<R>, P extends BasicEntity, Tab e
     public List<P> listConditionPage(Map map, Paging paging) {
         Condition condition = ConditionUtils.parseMap(map);
         SelectConditionStep<Record> selectConditionStep = this.ctx().select().from(t).where(condition);
+//        selectConditionStep.orderBy()
         return selectByPageAndCount(selectConditionStep, paging, getType());
     }
 

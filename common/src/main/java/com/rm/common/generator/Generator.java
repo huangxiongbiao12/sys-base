@@ -44,6 +44,7 @@ public class Generator {
     private static final String IMPORT_DATE = "import java.util.Date;\r\n";
     private static final String IMPORT_LOCALDATETIME = "import java.time.LocalDateTime;\r\n";
     private static final String IMPORT_BASEENTITY = "import com.rm.common.jooq.BasicEntity;\r\n";
+    private static final String IMPORT_DATA = "import lombok.Data;\r\n";
 
 
     /*数据库初始化*/
@@ -146,6 +147,8 @@ public class Generator {
                     fileBuffer.append("package " + entityPackage + ";\r\n\n");
                 fileBuffer.append("import java.io.Serializable;" + "\r\n");
                 fileBuffer.append(IMPORT_BASEENTITY);
+                fileBuffer.append(IMPORT_DATA);
+
                 //类实体文本
                 StringBuffer contentBuffer = new StringBuffer();
                 //类名称
@@ -154,6 +157,7 @@ public class Generator {
                 contentBuffer.append(" *\tCreated by admin on " + new Date() + "\r\n");
                 contentBuffer.append(" *\t" + tableRemake + "\r\n");
                 contentBuffer.append(" */\r\n");
+                contentBuffer.append("@Data\r\n");
                 contentBuffer.append("public class " + getEntityName(tableName) + " extends BasicEntity implements Serializable" + "{\r\n");
                 //属性文本
                 StringBuffer attrBuffer = new StringBuffer();
@@ -177,7 +181,7 @@ public class Generator {
                         }
                         i = 1;
                     }
-                    addMethod(methodBuffer, colrs);
+//                    addMethod(methodBuffer, colrs);
                 }
 
                 contentBuffer.append(attrBuffer);
@@ -418,7 +422,7 @@ public class Generator {
                 context.put("domainName", domainName);
                 context.put("mapping", tableName.replace("_", "-"));
                 context.put("daoPackage", daoPackage);
-                context.put("attrName", columnName2AttrName(domainName));
+                context.put("attrName", columnName2AttrName(tableName));
                 Template t = ve.getTemplate("template/controller.template", "UTF-8");
 
                 File file = new File(targetFile);
