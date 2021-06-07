@@ -39,6 +39,7 @@ public class AuthInterceptor extends HandlerInterceptorAdapter {
             response.setHeader("Access-Control-Exposed-Headers", Token.HEADER_TOKEN);
             Method method = ((HandlerMethod) handler).getMethod();
             log.info(method.getName());
+            TokenManager.set(null);
             if ("error".equals(method.getName())) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 return true;

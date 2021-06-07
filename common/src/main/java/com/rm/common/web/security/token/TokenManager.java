@@ -29,6 +29,19 @@ public class TokenManager {
     private RmSecurityProperties rmSecurityProperties;
 
     /**
+     * 保存登录信息上下文
+     */
+    private static ThreadLocal<Token> tokenContext = new ThreadLocal<>();
+
+    public static Token get() {
+        return tokenContext.get();
+    }
+
+    public static void set(Token token) {
+        tokenContext.set(token);
+    }
+
+    /**
      * 创建token，token会在配置的时间之后失效
      *
      * @param userId 用户Id
@@ -87,6 +100,7 @@ public class TokenManager {
                 }
                 //延长过期时间
                 cached.setCtime(LocalDateTime.now());
+                set(token);
                 cacheService.set(key, cached);
                 return cached;//登陆验证成功，返回所缓存的token
             }
