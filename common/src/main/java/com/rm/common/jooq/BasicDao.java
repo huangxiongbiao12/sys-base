@@ -64,8 +64,13 @@ public class BasicDao<R extends UpdatableRecord<R>, P extends BasicEntity, Tab e
         if (hasCount) {
             page.setTotal(this.ctx().fetchCount(clause));
         }
-        List<T> results = clause.limit(page.getOffset(), page.getPageSize())
-                .fetchInto(dtoClass);
+        List<T> results = null;
+        if (page.getPageSize() != 0) {
+            results = clause.limit(page.getOffset(), page.getPageSize())
+                    .fetchInto(dtoClass);
+        } else {
+            results = clause.fetchInto(dtoClass);
+        }
         page.setVal(results);
         return results;
     }
