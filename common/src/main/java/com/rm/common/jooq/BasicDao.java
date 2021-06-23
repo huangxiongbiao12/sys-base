@@ -38,6 +38,21 @@ public class BasicDao<R extends UpdatableRecord<R>, P extends BasicEntity, Tab e
         super.insert(object);
     }
 
+    @Override
+    public void update(P object) {
+        update(object, true);
+    }
+
+    public void update(P object, boolean excludeNull) {
+        R record = ctx().newRecord(t, object);
+        int size = record.size();
+        for (int i = 0; i < size; i++)
+            if (record.get(i) == null)
+                if (excludeNull)
+                    record.changed(i, false);
+        record.update();
+    }
+
     /**
      * 根据条件组装分页查询
      *

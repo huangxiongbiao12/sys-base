@@ -32,4 +32,26 @@
         </dependency>
     </dependencies>
 
+    <repositories>
+        <repository>
+            <id>central</id>
+            <name>Maven Central</name>
+            <url>https://repo1.maven.org/maven2/</url>
+        </repository>
+        <repository>
+            <id>rm</id>
+            <url>http://192.168.9.45:9000</url>
+        </repository>
+    </repositories>
+    <distributionManagement>
+        <repository>
+            <id>rm</id>
+            <url>http://192.168.9.45:9000/releases</url>
+        </repository>
+        <snapshotRepository>
+            <id>rm</id>
+            <url>http://192.168.9.45:9000/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
+
 </project>
