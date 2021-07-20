@@ -12,7 +12,7 @@
         <version>2.4.4</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.rm</groupId>
+    <groupId>com.rm.sys</groupId>
     <artifactId>sys-base</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>sys-base</name>
