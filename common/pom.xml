@@ -3,20 +3,33 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>sys-base</artifactId>
-        <groupId>com.rm.sys</groupId>
-        <version>0.0.1-SNAPSHOT</version>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.4.4</version>
+        <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
+    <groupId>com.rm.sys</groupId>
     <artifactId>common</artifactId>
-
+    <version>0.0.2</version>
+    <name>common</name>
+    <description>系统基础</description>
     <properties>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
+        <java.version>1.8</java.version>
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -134,5 +147,27 @@
         </dependency>
 
     </dependencies>
+
+    <repositories>
+        <repository>
+            <id>central</id>
+            <name>Maven Central</name>
+            <url>https://repo1.maven.org/maven2/</url>
+        </repository>
+        <repository>
+            <id>rm</id>
+            <url>http://192.168.9.45:9000</url>
+        </repository>
+    </repositories>
+    <distributionManagement>
+        <repository>
+            <id>rm</id>
+            <url>http://192.168.9.45:9000/releases</url>
+        </repository>
+        <snapshotRepository>
+            <id>rm</id>
+            <url>http://192.168.9.45:9000/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
 
 </project>
