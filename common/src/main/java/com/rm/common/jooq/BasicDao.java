@@ -76,17 +76,21 @@ public class BasicDao<R extends UpdatableRecord<R>, P extends BasicEntity, Tab e
      * @return
      */
     public <T> List<T> selectByPage(SelectConditionStep<Record> clause, Paging<T> page, boolean hasCount, Class<T> dtoClass) {
-        if (hasCount) {
-            page.setTotal(this.ctx().fetchCount(clause));
-        }
         List<T> results = null;
-        if (page.getPageSize() != 0) {
-            results = clause.limit(page.getOffset(), page.getPageSize())
-                    .fetchInto(dtoClass);
+        if (page != null) {
+            if (hasCount) {
+                page.setTotal(this.ctx().fetchCount(clause));
+            }
+            if (page.getPageSize() != 0) {
+                results = clause.limit(page.getOffset(), page.getPageSize())
+                        .fetchInto(dtoClass);
+            } else {
+                results = clause.fetchInto(dtoClass);
+            }
+            page.setVal(results);
         } else {
             results = clause.fetchInto(dtoClass);
         }
-        page.setVal(results);
         return results;
     }
 
