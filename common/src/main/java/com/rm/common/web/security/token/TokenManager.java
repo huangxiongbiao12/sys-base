@@ -54,6 +54,10 @@ public class TokenManager {
         return token;
     }
 
+    public Token create(String userId, Set<String> signSet) {
+        return create(userId, EPlatform.Any, signSet);
+    }
+
     /**
      * 根据用户id删除token
      *
