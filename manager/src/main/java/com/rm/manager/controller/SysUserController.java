@@ -1,5 +1,6 @@
 package com.rm.manager.controller;
 
+import com.rm.common.web.security.annotation.Disauth;
 import com.rm.manager.entity.SysUserEntity;
 import com.rm.manager.service.SysUserService;
 import org.springframework.beans.factory.annotation.Autowired;
