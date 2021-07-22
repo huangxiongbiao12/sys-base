@@ -1,5 +1,6 @@
 package com.rm.common.web.response;
 
+import com.alibaba.fastjson.JSON;
 import com.rm.common.web.exception.ResponseException;
 import com.rm.common.web.exception.TokenException;
 import lombok.extern.slf4j.Slf4j;
@@ -99,6 +100,9 @@ public class ResponseHandler implements ResponseBodyAdvice<Object> {
         // 返回的值是bool类型 为false时失败
         if (object.toString().equalsIgnoreCase("false")) {
             return Result.error(ResponseEnum.SYSTEM_OPER_ERROR.newInstance(oper + "失败"));
+        }
+        if (object instanceof String) {
+            return JSON.toJSONString(Result.success(object, oper + "成功"));
         }
         return Result.success(object, oper + "成功");
     }
