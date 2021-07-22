@@ -78,7 +78,7 @@ public class TokenManager {
         if (StringUtils.hasText(tokenString)) {
             String[] csv = tokenString.split(Token.TOKEN_SPLIT);
             if (csv.length >= 3) {
-                return new Token(csv[0], csv[1], EPlatform.valueOf(csv[2]), null);
+                return new Token(csv[0], csv[1], EPlatform.valuesOf(csv[2]), null);
             }
         }
         return null;

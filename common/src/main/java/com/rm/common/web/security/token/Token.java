@@ -30,7 +30,7 @@ public class Token implements Serializable {
     /**
      * token分割符  asccii 分组符
      */
-    public static final String TOKEN_SPLIT = Character.toString((char) 29);
+    public static final String TOKEN_SPLIT = "_";
 
     private String userId;
 

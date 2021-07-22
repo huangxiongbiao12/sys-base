@@ -21,15 +21,15 @@ public enum EPlatform {
     }
 
 
-//    public EPlatform valuesOf(String des) {
-//        EPlatform[] values = EPlatform.values();
-//        for (EPlatform plat : values) {
-//            if (plat.description.equals(des)) {
-//                return plat;
-//            }
-//        }
-//        return EPlatform.Others;
-//    }
+    public static EPlatform valuesOf(String des) {
+        EPlatform[] values = EPlatform.values();
+        for (EPlatform plat : values) {
+            if (plat.description.equals(des)) {
+                return plat;
+            }
+        }
+        return EPlatform.Others;
+    }
 
     public String toString(){
         return description;
