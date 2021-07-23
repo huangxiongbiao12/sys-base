@@ -211,7 +211,7 @@ public class Generator {
 
                 pw.flush();
                 pw.close();
-
+                System.out.println("成功生成Java文件:" + (classFilePath).replaceAll("/", "\\\\"));
             }
         } catch (SQLException | IOException e) {
             // TODO Auto-generated catch block
@@ -515,7 +515,7 @@ public class Generator {
         }
 
         if (!savePath.equals("")) path = path + "/" + savePath.replace(".", "/") + "/";
-        System.out.println(path);
+//        System.out.println(path);
 
         //创建目录
         File dir = new File(path);
