@@ -6,6 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestBody;
+import com.rm.common.web.response.ResponseEnum;
+import javax.servlet.http.HttpServletResponse;
+import java.net.URLEncoder;
+import com.alibaba.excel.EasyExcel;
 
 import com.rm.common.jooq.Paging;
 import com.rm.common.web.response.Page;
@@ -93,6 +97,40 @@ public class $!{domainName}Controller {
         Paging<$!{domainName}Entity> paging = new Paging<>(page.getPage(), page.getSize());
         $!{attrName}Service.listConditionPage(map, paging);
         return paging;
+    }
+
+    /**
+     * 根据条件导出excel
+     * 生成导出实体说明：
+     * 需要在表的备注内写 excel 标注为生成excel导出接口。
+     * 导出表格的格式：
+     * 字段注释内含有excel标注，会以注释第一行替换掉excel为 excel表头导出 字段顺序为excel顺序
+     * 未标注excel注释的 不会作为导出字段导出
+     *
+     * @param response
+     * @param map      map参数和上面分页条件查询一样
+     *
+     */
+    @RequestMapping("export")
+    public void export(HttpServletResponse response, @RequestBody Map map) {
+        // 这里注意 有同学反应使用swagger 会导致各种问题，请直接用浏览器或者用postman
+        try {
+            response.setContentType("application/vnd.ms-excel");
+            response.setCharacterEncoding("utf-8");
+            // 这里URLEncoder.encode可以防止中文乱码 当然和easyexcel没有关系
+            String fileName = URLEncoder.encode("$!{fileName}", "UTF-8").replaceAll("\\+", "%20");
+            response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName + ".xlsx");
+            // 这里需要设置不关闭流,根据map条件查询导出数据
+            List<$!{domainName}Entity> dataList = $!{attrName}Service.listConditionPage(map, null);
+            EasyExcel.write(response.getOutputStream(), $!{domainName}Entity.class).autoCloseStream(Boolean.FALSE).sheet("$!{fileName}")
+                    .doWrite(dataList);
+        } catch (Exception e) {
+            // 重置response
+            response.reset();
+            response.setContentType("application/json");
+            response.setCharacterEncoding("utf-8");
+            throw ResponseEnum.SYSTEM_ERROR.throwEx("导出文件失败!", e);
+        }
     }
 
 }

@@ -34,6 +34,9 @@ public class Generator {
     // 代码模板的位置
     static String templateDir = "/Users/apple/Desktop/code/github/sys-base/common/src/main/resources/template";
 
+    // 导出excel备注标志
+    private final static String EXCEL_FLAG = "excel";
+
 
     private static Connection connection = null;
     private static DatabaseMetaData dbmd = null;
@@ -45,6 +48,7 @@ public class Generator {
     private static final String IMPORT_LOCALDATETIME = "import java.time.LocalDateTime;\r\n";
     private static final String IMPORT_BASEENTITY = "import com.rm.common.jooq.BasicEntity;\r\n";
     private static final String IMPORT_DATA = "import lombok.Data;\r\n";
+    private static final String IMPORT_EXCEL = "import com.alibaba.excel.annotation.ExcelIgnore;\r\nimport com.alibaba.excel.annotation.ExcelProperty;\r\n";
 
 
     /*数据库初始化*/
@@ -133,6 +137,7 @@ public class Generator {
                 //表名
                 String tableName = resultSet.getString("TABLE_NAME");
                 String tableRemake = resultSet.getString("REMARKS");
+                boolean isExport = tableRemake.contains(EXCEL_FLAG);
                 //字段信息集合
                 ResultSet colrs = dbmd.getColumns(connection.getCatalog(), connection.getSchema(), tableName, "%");
                 //创建类文件
@@ -148,7 +153,10 @@ public class Generator {
                 fileBuffer.append("import java.io.Serializable;" + "\r\n");
                 fileBuffer.append(IMPORT_BASEENTITY);
                 fileBuffer.append(IMPORT_DATA);
-
+                // 导出excel注解引入
+                if (isExport) {
+                    fileBuffer.append(IMPORT_EXCEL);
+                }
                 //类实体文本
                 StringBuffer contentBuffer = new StringBuffer();
                 //类名称
@@ -172,7 +180,7 @@ public class Generator {
                 int i = 0;
                 //写入属性 setter和getter方法
                 while (colrs.next()) {
-                    addField(attrBuffer, colrs);
+                    addField(isExport, attrBuffer, colrs);
                     if (sqlType2JavaType(colrs.getString("TYPE_NAME")).contains("Date") && i == 0) {
                         if (generatorProperties.getDateType() == GeneratorProperties.DATEType.Date) {
                             fileBuffer.append(IMPORT_DATE);
@@ -185,7 +193,7 @@ public class Generator {
                 }
 
                 contentBuffer.append(attrBuffer);
-                contentBuffer.append(methodBuffer);
+//                contentBuffer.append(methodBuffer);
                 contentBuffer.append("}\r\n");
 
                 fileBuffer.append(contentBuffer);
@@ -423,8 +431,18 @@ public class Generator {
                 context.put("mapping", tableName.replace("_", "-"));
                 context.put("daoPackage", daoPackage);
                 context.put("attrName", columnName2AttrName(tableName));
-                Template t = ve.getTemplate("template/controller.template", "UTF-8");
-
+                Template t = null;
+                // 生成excel 导出接口 判断
+                if (!tableRemake.contains(EXCEL_FLAG)) {
+                    t = ve.getTemplate("template/controller.template", "UTF-8");
+                } else {
+                    if (tableRemake.contains("\n")) {
+                        tableRemake = tableRemake.substring(0, tableRemake.indexOf("\n"));
+                    }
+                    String fileName = tableRemake.trim().replace(EXCEL_FLAG, "");
+                    context.put("fileName", fileName);
+                    t = ve.getTemplate("template/export_controller.template", "UTF-8");
+                }
                 File file = new File(targetFile);
                 if (!file.getParentFile().exists())
                     file.getParentFile().mkdirs();
@@ -512,13 +530,26 @@ public class Generator {
      * @return
      * @throws SQLException
      */
-    private static StringBuffer addField(StringBuffer contentBuffer, ResultSet resultSet) throws SQLException {
+    private static StringBuffer addField(boolean isExport, StringBuffer contentBuffer, ResultSet resultSet) throws SQLException {
         if (contentBuffer == null || resultSet == null) return contentBuffer;
         //先写注释
+        String remarks = resultSet.getString("REMARKS");
         contentBuffer.append("\r\n");
         contentBuffer.append("\t/**\r\n");
-        contentBuffer.append("\t *\t" + resultSet.getString("REMARKS") + "\r\n");
+        contentBuffer.append("\t *\t" + remarks + "\r\n");
         contentBuffer.append("\t */\r\n");
+        //写excel注解
+        if (isExport) {
+            // 备注含有 excel的 写导出注解 否则忽略
+            if (remarks.contains(EXCEL_FLAG)) {
+                if (remarks.contains("\n")) {
+                    remarks = remarks.substring(0, remarks.indexOf("\n"));
+                }
+                contentBuffer.append("\t@ExcelProperty(\"" + remarks.replace(EXCEL_FLAG, "").trim() + "\")\r\n");
+            } else {
+                contentBuffer.append("\t@ExcelIgnore\r\n");
+            }
+        }
         //写属性
         contentBuffer.append("\tprivate " + sqlType2JavaType(resultSet.getString("TYPE_NAME")) + " "
                 + columnName2AttrName(resultSet.getString("COLUMN_NAME")) + ";\r\n");
