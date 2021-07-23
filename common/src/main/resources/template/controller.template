@@ -85,6 +85,8 @@ public class $!{domainName}Controller {
      * @param map  key为表字段，默认以等于条件查询 where key=value，
      *             其他简单条件查询使用 字段名-条件（）  会在where后面是有字段当条件查询
      *             例如： key: a-like value: nihao   sql：where `a` like 'nihao'
+                   排序： order- 开头加字段名排序  1 升序 0 降序
+                        key：order-a value: 1  sql  order by a asc
      * @param page
      * @return
      */

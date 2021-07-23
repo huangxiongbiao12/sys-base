@@ -44,8 +44,8 @@ public class Generator {
     private static GeneratorProperties generatorProperties;
 
     // 时间包
-    private static final String IMPORT_DATE = "import java.util.Date;\r\n";
-    private static final String IMPORT_LOCALDATETIME = "import java.time.LocalDateTime;\r\n";
+    private static final String IMPORT_DATE = "import java.util.Date;\r\nimport com.alibaba.excel.annotation.format.DateTimeFormat;\r\n";
+    private static final String IMPORT_LOCALDATETIME = "import java.time.LocalDateTime;\r\nimport com.rm.common.utils.excel.LocalDateTimeConverter;\r\n";
     private static final String IMPORT_BASEENTITY = "import com.rm.common.jooq.BasicEntity;\r\n";
     private static final String IMPORT_DATA = "import lombok.Data;\r\n";
     private static final String IMPORT_EXCEL = "import com.alibaba.excel.annotation.ExcelIgnore;\r\nimport com.alibaba.excel.annotation.ExcelProperty;\r\n";
@@ -545,7 +545,17 @@ public class Generator {
                 if (remarks.contains("\n")) {
                     remarks = remarks.substring(0, remarks.indexOf("\n"));
                 }
-                contentBuffer.append("\t@ExcelProperty(\"" + remarks.replace(EXCEL_FLAG, "").trim() + "\")\r\n");
+                // 字段如果为日期格式需要转换格式
+                if (sqlType2JavaType(resultSet.getString("TYPE_NAME")).contains("Date")) {
+                    if (generatorProperties.getDateType() != GeneratorProperties.DATEType.Date) {
+                        contentBuffer.append("\t@ExcelProperty(value = \"" + remarks.replace(EXCEL_FLAG, "").trim() + "\", converter = LocalDateTimeConverter.class)\r\n");
+                    } else {
+                        contentBuffer.append("\t@DateTimeFormat(\"yyyy-MM-dd HH:mm:ss\")\r\n");
+                        contentBuffer.append("\t@ExcelProperty(\"" + remarks.replace(EXCEL_FLAG, "").trim() + "\")\r\n");
+                    }
+                } else {
+                    contentBuffer.append("\t@ExcelProperty(\"" + remarks.replace(EXCEL_FLAG, "").trim() + "\")\r\n");
+                }
             } else {
                 contentBuffer.append("\t@ExcelIgnore\r\n");
             }
