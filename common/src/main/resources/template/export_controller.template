@@ -10,6 +10,7 @@ import com.rm.common.web.response.ResponseEnum;
 import javax.servlet.http.HttpServletResponse;
 import java.net.URLEncoder;
 import com.alibaba.excel.EasyExcel;
+import com.alibaba.excel.write.style.column.LongestMatchColumnWidthStyleStrategy;
 
 import com.rm.common.jooq.Paging;
 import com.rm.common.web.response.Page;
@@ -124,7 +125,7 @@ public class $!{domainName}Controller {
             response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName + ".xlsx");
             // 这里需要设置不关闭流,根据map条件查询导出数据
             List<$!{domainName}Entity> dataList = $!{attrName}Service.listConditionPage(map, null);
-            EasyExcel.write(response.getOutputStream(), $!{domainName}Entity.class).autoCloseStream(Boolean.FALSE).sheet("$!{fileName}")
+            EasyExcel.write(response.getOutputStream(), $!{domainName}Entity.class).registerWriteHandler(new LongestMatchColumnWidthStyleStrategy()).autoCloseStream(Boolean.FALSE).sheet("$!{fileName}")
                     .doWrite(dataList);
         } catch (Exception e) {
             // 重置response

@@ -1,5 +1,6 @@
 package com.rm.common.jooq;
 
+import com.alibaba.excel.annotation.ExcelIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -7,5 +8,6 @@ import lombok.Setter;
 @Setter
 public class BasicEntity {
 
+    @ExcelIgnore
     private String id;
 }

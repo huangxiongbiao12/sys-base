@@ -1,5 +1,7 @@
 package com.rm.common.generator;
 
+import com.alibaba.excel.annotation.write.style.ContentFontStyle;
+import com.alibaba.excel.annotation.write.style.HeadFontStyle;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
@@ -48,7 +50,10 @@ public class Generator {
     private static final String IMPORT_LOCALDATETIME = "import java.time.LocalDateTime;\r\nimport com.rm.common.utils.excel.LocalDateTimeConverter;\r\n";
     private static final String IMPORT_BASEENTITY = "import com.rm.common.jooq.BasicEntity;\r\n";
     private static final String IMPORT_DATA = "import lombok.Data;\r\n";
-    private static final String IMPORT_EXCEL = "import com.alibaba.excel.annotation.ExcelIgnore;\r\nimport com.alibaba.excel.annotation.ExcelProperty;\r\n";
+    private static final String IMPORT_EXCEL = "import com.alibaba.excel.annotation.ExcelIgnore;\r\n" +
+            "import com.alibaba.excel.annotation.ExcelProperty;\r\n" +
+            "import com.alibaba.excel.annotation.write.style.ContentFontStyle;\r\n" +
+            "import com.alibaba.excel.annotation.write.style.HeadFontStyle;\r\n";
 
 
     /*数据库初始化*/
@@ -166,6 +171,10 @@ public class Generator {
                 contentBuffer.append(" *\t" + tableRemake + "\r\n");
                 contentBuffer.append(" */\r\n");
                 contentBuffer.append("@Data\r\n");
+                if (isExport) {
+                    contentBuffer.append("@HeadFontStyle(fontHeightInPoints = 12)\r\n");
+                    contentBuffer.append("@ContentFontStyle(fontHeightInPoints = 11)\r\n");
+                }
                 contentBuffer.append("public class " + getEntityName(tableName) + " extends BasicEntity implements Serializable" + "{\r\n");
                 //属性文本
                 StringBuffer attrBuffer = new StringBuffer();
