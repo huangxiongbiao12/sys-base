@@ -6,6 +6,8 @@ import org.apache.log4j.Logger;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -70,6 +72,44 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
     public static final SimpleDateFormat LONG_DATE_FORMAT = new SimpleDateFormat(PATTERN_yyyy_MM_dd_HH_mm_ss);
     public static final SimpleDateFormat HMS_FORMAT = new SimpleDateFormat(PATTERN_HH_mm_ss);
     public static final SimpleDateFormat formatTimestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+
+    public static final String YMDHMS = "yyyy-MM-dd HH:mm:ss";
+    public static final String YMD = "yyyy-MM-dd";
+
+
+    public static String format(LocalDateTime localDateTime, String pattern) {
+        DateTimeFormatter df = DateTimeFormatter.ofPattern(pattern);
+        return df.format(localDateTime);
+    }
+
+    public static String formatYMD(LocalDateTime localDateTime) {
+        return format(localDateTime, YMD);
+    }
+
+    public static String formatYMDHMS(LocalDateTime localDateTime) {
+        return format(localDateTime, YMDHMS);
+    }
+
+    public static LocalDateTime parse(String timeStr, String pattern) {
+        DateTimeFormatter df = DateTimeFormatter.ofPattern(pattern);
+        return LocalDateTime.parse(timeStr, df);
+    }
+
+    public static LocalDateTime parseYMD(String timeStr) {
+        timeStr += " 00:00:00";
+        return parseYMDHMS(timeStr);
+    }
+
+    public static LocalDateTime parseYMDEND(String timeStr) {
+        timeStr += " 23:59:59";
+        return parseYMDHMS(timeStr);
+    }
+
+    public static LocalDateTime parseYMDHMS(String timeStr) {
+        return parse(timeStr, YMDHMS);
+    }
+
 
     /**
      * 根据日期格式字符串解析日期字符串
