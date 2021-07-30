@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
  * 该注解用于controller类的接口方法上
  *  拥有其中一个权限，即不能访问
  */
-@Target(ElementType.METHOD)
+@Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface RefuseAccess {
 

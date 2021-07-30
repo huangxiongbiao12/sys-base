@@ -1,19 +1,19 @@
 package com.rm.common.web.security.annotation;
 
+import com.rm.common.web.security.config.EPlatform;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 该注解用于controller类的接口方法上
- * identify为该接口访问权限，没有此权限不能访问该接口
- * 拥有其中一个权限，即可访问
+ * 该注解用于 Controller 上 区分客户端接口检验 token web端的接口需要web端的token才能访问
  */
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Access {
+public @interface CheckPlatform {
 
-    String[] identify() default {};
+    EPlatform value() default EPlatform.Any;
 
 }

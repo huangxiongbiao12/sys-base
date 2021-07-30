@@ -1,6 +1,7 @@
 package com.rm.common.web.security.interceptor;
 
 import com.rm.common.utils.CollectionUtils;
+import com.rm.common.web.security.annotation.CheckPlatform;
 import com.rm.common.web.security.annotation.Disauth;
 import com.rm.common.web.security.config.RmSecurityProperties;
 import com.rm.common.web.security.token.Token;
@@ -55,6 +56,18 @@ public class AuthInterceptor extends HandlerInterceptorAdapter {
                 return true;
             }
             Token token = tokenManager.parse(request.getHeader(Token.HEADER_TOKEN));
+            // 区分平台检验token
+            if (method.getDeclaringClass().getAnnotation(CheckPlatform.class) != null
+                    || method.getAnnotation(CheckPlatform.class) != null) {
+                CheckPlatform checkPlatform = method.getDeclaringClass().getAnnotation(CheckPlatform.class);
+                if (checkPlatform == null) {
+                    checkPlatform = method.getAnnotation(CheckPlatform.class);
+                }
+                if (!checkPlatform.value().equals(token.getPlatform())) {
+                    //登陆验证失败，标注401
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                }
+            }
             //验证token登陆状态
             token = tokenManager.check(token);
             // 验证token有效，且包含该接口权限则通过
