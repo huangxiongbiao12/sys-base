@@ -41,9 +41,9 @@ public class IDcardUtils {
         String sGender = "未知";
         String sCardNum = idCard.substring(16, 17);
         if (Integer.parseInt(sCardNum) % 2 != 0) {
-            sGender = "1";//男
+            sGender = "男";//男
         } else {
-            sGender = "2";//女
+            sGender = "女";//女
         }
         return sGender;
     }
