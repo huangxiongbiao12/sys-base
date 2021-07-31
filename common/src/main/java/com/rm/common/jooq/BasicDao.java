@@ -2,9 +2,13 @@ package com.rm.common.jooq;
 
 import org.jooq.*;
 import org.jooq.impl.DAOImpl;
+import org.jooq.impl.DSL;
+import org.jooq.impl.SQLDataType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -116,6 +120,30 @@ public class BasicDao<R extends UpdatableRecord<R>, P extends BasicEntity, Tab e
      */
     public <T> List<T> selectByPageAndCount(SelectConditionStep<Record> clause, Paging<T> page, Class<T> dtoClass) {
         return selectByPage(clause, page, true, dtoClass);
+    }
+
+    /**
+     * 日期函数处理
+     *
+     * @param field
+     * @param format
+     * @return
+     */
+    public static Field<String> dateFormat(Field<Date> field, String format) {
+        return DSL.field("date_format({0}, {1})", SQLDataType.VARCHAR,
+                field, DSL.inline(format));
+    }
+
+    /**
+     * 日期函数处理
+     *
+     * @param field
+     * @param format
+     * @return
+     */
+    public static Field<String> localdateFormat(Field<LocalDateTime> field, String format) {
+        return DSL.field("date_format({0}, {1})", SQLDataType.VARCHAR,
+                field, DSL.inline(format));
     }
 
 }
