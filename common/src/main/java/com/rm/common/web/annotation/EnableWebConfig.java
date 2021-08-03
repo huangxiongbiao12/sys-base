@@ -1,5 +1,6 @@
 package com.rm.common.web.annotation;
 
+import com.rm.common.web.log.LoggingFilter;
 import com.rm.common.web.response.ResponseHandler;
 import org.springframework.context.annotation.Import;
 
@@ -13,6 +14,6 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-@Import({ResponseHandler.class})
+@Import({ResponseHandler.class, LoggingFilter.class})
 public @interface EnableWebConfig {
 }
