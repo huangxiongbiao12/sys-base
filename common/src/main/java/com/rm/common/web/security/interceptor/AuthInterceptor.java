@@ -1,5 +1,6 @@
 package com.rm.common.web.security.interceptor;
 
+import com.alibaba.fastjson.JSON;
 import com.rm.common.utils.CollectionUtils;
 import com.rm.common.web.security.annotation.CheckPlatform;
 import com.rm.common.web.security.annotation.Disauth;
@@ -39,7 +40,8 @@ public class AuthInterceptor extends HandlerInterceptorAdapter {
             response.setHeader("Access-Control-Allow-Headers", "*");
             response.setHeader("Access-Control-Exposed-Headers", Token.HEADER_TOKEN);
             Method method = ((HandlerMethod) handler).getMethod();
-            log.info(method.getName());
+            String urlString = request.getRequestURI();
+//            log.info(urlString + "======" + JSON.toJSONString(request.getParameterMap()));
             TokenManager.set(null);
             if ("error".equals(method.getName())) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
