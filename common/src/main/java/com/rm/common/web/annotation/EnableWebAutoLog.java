@@ -14,6 +14,6 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-@Import({ResponseHandler.class})
-public @interface EnableWebConfig {
+@Import({LoggingFilter.class})
+public @interface EnableWebAutoLog {
 }
