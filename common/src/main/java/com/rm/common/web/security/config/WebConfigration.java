@@ -9,6 +9,7 @@ import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilde
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
@@ -65,6 +66,9 @@ public class WebConfigration extends WebMvcConfigurerAdapter {
         return new Converter<String, LocalDateTime>() {
             @Override
             public LocalDateTime convert(String source) {
+                if (!StringUtils.hasLength(source)) {
+                    return null;
+                }
                 DateTimeFormatter df = DateTimeFormatter.ofPattern(pattern);
                 LocalDateTime date = null;
                 try {

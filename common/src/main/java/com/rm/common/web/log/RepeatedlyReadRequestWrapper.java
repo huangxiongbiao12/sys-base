@@ -1,36 +1,31 @@
 package com.rm.common.web.log;
 
-import org.apache.commons.lang.StringUtils;
-
 import javax.servlet.ReadListener;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.Charset;
+import java.io.*;
 
 public class RepeatedlyReadRequestWrapper extends HttpServletRequestWrapper {
-    private final byte[] body;
+    /**
+     * 存储请求数据
+     */
+    private String body;
 
-    public RepeatedlyReadRequestWrapper(HttpServletRequest request)
-            throws IOException {
+    public RepeatedlyReadRequestWrapper(HttpServletRequest request) {
         super(request);
-        body = readBytes(request.getReader(), "UTF-8");
+        renewBody(request);
     }
 
-    @Override
-    public BufferedReader getReader() throws IOException {
-        return new BufferedReader(new InputStreamReader(getInputStream()));
-    }
-
+    /**
+     * 重写getInputStream方法
+     *
+     * @return
+     */
     @Override
     public ServletInputStream getInputStream() {
-        final ByteArrayInputStream bais = new ByteArrayInputStream(body);
-        return new ServletInputStream() {
-
+        final ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(body.getBytes());
+        ServletInputStream servletInputStream = new ServletInputStream() {
             @Override
             public boolean isFinished() {
                 return false;
@@ -42,33 +37,61 @@ public class RepeatedlyReadRequestWrapper extends HttpServletRequestWrapper {
             }
 
             @Override
-            public void setReadListener(ReadListener listener) {
-
+            public void setReadListener(ReadListener readListener) {
             }
 
             @Override
             public int read() {
-                return bais.read();
+                return byteArrayInputStream.read();
             }
         };
+        return servletInputStream;
+
     }
 
     /**
-     * 通过BufferedReader和字符编码集转换成byte数组
+     * 重写getReader方法
      *
-     * @param br
-     * @param encoding
      * @return
-     * @throws IOException
      */
-    private byte[] readBytes(BufferedReader br, String encoding) throws IOException {
-        String str = null, retStr = "";
-        while ((str = br.readLine()) != null) {
-            retStr += str;
+    @Override
+    public BufferedReader getReader() {
+        return new BufferedReader(new InputStreamReader(this.getInputStream()));
+    }
+
+    /**
+     * 读取body的值
+     *
+     * @param request
+     */
+    private void renewBody(HttpServletRequest request) {
+        StringBuilder stringBuilder = new StringBuilder();
+        BufferedReader bufferedReader = null;
+        try {
+            InputStream inputStream = request.getInputStream();
+            if (inputStream != null) {
+                bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+                char[] charBuffer = new char[128];
+                int bytesRead = -1;
+                while ((bytesRead = bufferedReader.read(charBuffer)) > 0) {
+                    stringBuilder.append(charBuffer, 0, bytesRead);
+                }
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        } finally {
+            if (bufferedReader != null) {
+                try {
+                    bufferedReader.close();
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
         }
-        if (StringUtils.isNotBlank(retStr)) {
-            return retStr.getBytes(Charset.forName(encoding));
-        }
-        return null;
+        body = stringBuilder.toString();
+    }
+
+    public String getBody() {
+        return body;
     }
 }

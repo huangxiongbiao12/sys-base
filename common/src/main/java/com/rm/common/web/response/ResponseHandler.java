@@ -111,7 +111,7 @@ public class ResponseHandler implements ResponseBodyAdvice<Object> {
         if (returnType != null && Collection.class.isAssignableFrom(returnType)) {
             return Result.success(new ArrayList<>(), "");
         }
-        return Result.success("", "");
+        return Result.success(null, "");
     }
 
 
