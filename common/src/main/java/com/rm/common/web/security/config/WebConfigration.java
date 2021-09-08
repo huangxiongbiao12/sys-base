@@ -69,6 +69,9 @@ public class WebConfigration extends WebMvcConfigurerAdapter {
                 if (!StringUtils.hasLength(source)) {
                     return null;
                 }
+                if (source.length() == 10) {
+                    source = source + " 00:00:00";
+                }
                 DateTimeFormatter df = DateTimeFormatter.ofPattern(pattern);
                 LocalDateTime date = null;
                 try {
