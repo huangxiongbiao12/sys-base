@@ -33,6 +33,9 @@ public class AuthInterceptor extends HandlerInterceptorAdapter {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        if (!rmSecurityProperties.isEnable()) {
+            return true;
+        }
         if (handler instanceof HandlerMethod) {
             response.setHeader("Access-Control-Allow-Origin", "*");
             response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");

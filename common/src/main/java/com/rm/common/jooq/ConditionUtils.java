@@ -77,7 +77,7 @@ public class ConditionUtils {
      * @return
      */
     public static void checkInjSql(String str) {
-        String flagStr = "`|'|and |and(|or |or(|exec|insert|select|delete|update|truncate |truncate(|char|declare |;|,";
+        String flagStr = "`|'|and |and(|or |or(|exec |insert |select |delete |update |truncate |truncate(|char(|declare |;|,";
         //这里的东西还可以自己添加
         String[] flags = flagStr.split("\\|");
         for (int i = 0; i < flags.length; i++) {
