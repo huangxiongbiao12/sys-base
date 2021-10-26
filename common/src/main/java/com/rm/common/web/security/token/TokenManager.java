@@ -68,6 +68,10 @@ public class TokenManager {
         cacheService.remove(key);
     }
 
+    public void delete() {
+        delete(get());
+    }
+
     /**
      * 将校验字符串解析为Token
      *
