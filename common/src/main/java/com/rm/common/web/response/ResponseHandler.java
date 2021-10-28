@@ -51,11 +51,16 @@ public class ResponseHandler implements ResponseBodyAdvice<Object> {
         if ((HttpStatus.OK.value() !=
                 ((ServletServerHttpResponse) serverHttpResponse)
                         .getServletResponse().getStatus())
-                || object instanceof Result || object instanceof Resource || object instanceof OriginResult) {
+                || object instanceof Result || object instanceof Resource) {
             return object;
         }
 
         final Method method = methodParameter.getMethod();
+        // 注解接口不做结果拦截处理
+        if (method.getDeclaringClass().getAnnotation(OriginResult.class) != null
+                || method.getAnnotation(OriginResult.class) != null) {
+            return object;
+        }
         if (object == null) return defaultReturn(method.getReturnType());
 
         // 放过所有swagger家族的成员，惹不起惹不起
