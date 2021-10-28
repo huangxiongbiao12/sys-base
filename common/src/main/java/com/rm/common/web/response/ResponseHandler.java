@@ -51,7 +51,7 @@ public class ResponseHandler implements ResponseBodyAdvice<Object> {
         if ((HttpStatus.OK.value() !=
                 ((ServletServerHttpResponse) serverHttpResponse)
                         .getServletResponse().getStatus())
-                || object instanceof Result || object instanceof Resource) {
+                || object instanceof Result || object instanceof Resource || object instanceof OriginResult) {
             return object;
         }
 
