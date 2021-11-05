@@ -19,6 +19,11 @@ public class RmSecurityProperties {
     private boolean enable = true;
 
     /**
+     * 单点登录开关
+     */
+    private boolean sso = false;
+
+    /**
      * 是否允许跨域
      */
     private boolean crossOrigin = true;
@@ -50,7 +55,6 @@ public class RmSecurityProperties {
 
     /**
      * 不需要鉴权的path集合  正则表达式
-     *
      */
     private String[] disauth = {};
 

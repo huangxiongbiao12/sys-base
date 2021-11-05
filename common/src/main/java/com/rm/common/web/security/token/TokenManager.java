@@ -2,6 +2,7 @@ package com.rm.common.web.security.token;
 
 
 import com.rm.common.cache.CacheService;
+import com.rm.common.jooq.SnowflakeIdWorker;
 import com.rm.common.utils.DateUtils;
 import com.rm.common.utils.IdGenerator;
 import com.rm.common.web.security.config.EPlatform;
@@ -48,8 +49,9 @@ public class TokenManager {
      * @return 创建好的token
      */
     public Token create(String userId, EPlatform platform, Set<String> signSet) {
-        String key = getKey(userId, platform);
-        Token token = new Token(userId, IdGenerator.uuid(), platform, signSet);
+        String uuid = SnowflakeIdWorker.generateId();
+        String key = getKey(userId, platform, uuid);
+        Token token = new Token(userId, uuid, platform, signSet);
         cacheService.set(key, token);
         return token;
     }
@@ -64,7 +66,7 @@ public class TokenManager {
      * @param token 用户id
      */
     public void delete(Token token) {
-        String key = getKey(token.getUserId(), token.getPlatform());
+        String key = getKey(token.getUserId(), token.getPlatform(), token.getUuid());
         cacheService.remove(key);
     }
 
@@ -96,7 +98,7 @@ public class TokenManager {
      */
     public Token check(Token token) {
         if (token != null) {
-            String key = getKey(token.getUserId(), token.getPlatform());
+            String key = getKey(token.getUserId(), token.getPlatform(), token.getUuid());
             Token cached = (Token) cacheService.get(key);
             //  过期时间判断 过期删除  延长有效时间
             if (cached != null && cached.equals(token)) {
@@ -122,8 +124,12 @@ public class TokenManager {
      * @param userId
      * @return
      */
-    private String getKey(String userId, EPlatform platform) {
-        return Token.HEADER_TOKEN + ":" + platform.getDescription() + ":" + userId;
+    private String getKey(String userId, EPlatform platform, String uuid) {
+        if (rmSecurityProperties.isSso()) {
+            return Token.HEADER_TOKEN + ":" + platform.getDescription() + ":" + userId;
+        } else {
+            return Token.HEADER_TOKEN + ":" + platform.getDescription() + ":" + userId + ":" + uuid;
+        }
     }
 
 }
