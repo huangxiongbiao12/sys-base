@@ -167,7 +167,7 @@ public class Generator {
                 //类名称
                 contentBuffer.append("\r\n");
                 contentBuffer.append("/**\r\n");
-                contentBuffer.append(" *\tCreated by admin on " + new Date() + "\r\n");
+//                contentBuffer.append(" *\tCreated by admin on " + new Date() + "\r\n");
                 contentBuffer.append(" *\t" + tableRemake + "\r\n");
                 contentBuffer.append(" */\r\n");
                 contentBuffer.append("@Data\r\n");
