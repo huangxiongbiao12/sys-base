@@ -1,6 +1,7 @@
 package com.rm.common.web.file;
 
 import com.rm.common.web.file.service.FileService;
+import com.rm.common.web.security.annotation.Disauth;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -10,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("file")
+@Disauth
 public class FileController {
 
     @Autowired

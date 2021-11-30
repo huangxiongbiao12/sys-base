@@ -1,6 +1,7 @@
 package com.rm.common.web.file.service.impl;
 
 
+import com.rm.common.jooq.SnowflakeIdWorker;
 import com.rm.common.utils.DateUtils;
 import com.rm.common.utils.FileUtils;
 import com.rm.common.web.file.service.FileService;
@@ -43,7 +44,8 @@ public class FileServiceImpl implements FileService {
      */
     private String getFilePath(String fileName) {
         String date = DateUtils.format(LocalDateTime.now(), "yyyyMMdd");
-        return "/" + date + "/" + UUID.randomUUID() + "." + fileName;
+        String suffix = fileName.substring(fileName.lastIndexOf(".")).toLowerCase();
+        return "/" + date + "/" + SnowflakeIdWorker.generateId() + suffix;
     }
 
 }
