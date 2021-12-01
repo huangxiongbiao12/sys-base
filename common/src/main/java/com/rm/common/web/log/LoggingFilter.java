@@ -22,6 +22,7 @@ public class LoggingFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response,
                          FilterChain chain) throws IOException, ServletException {
         // TODO Auto-generated method stub
+        long sTime = System.currentTimeMillis();
         boolean isJson = false;
         if (StringUtils.hasLength(request.getContentType()) && request.getContentType().contains(MediaType.APPLICATION_JSON_VALUE)) {
             isJson = true;
@@ -76,6 +77,7 @@ public class LoggingFilter implements Filter {
             } else {
                 chain.doFilter(request, response);
             }
+            log.info("{}-请求时长：{}ms", req.getRequestURL(), System.currentTimeMillis() - sTime);
         } catch (IOException ex) {
             log.error("请求日志打印异常：", ex);
         }

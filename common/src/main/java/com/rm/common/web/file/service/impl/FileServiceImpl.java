@@ -28,7 +28,15 @@ public class FileServiceImpl implements FileService {
         String rPath = getFilePath(fileName);
         String absolutePath = basePath + rPath;
         try {
-            FileUtils.saveFile(absolutePath, file.getInputStream());
+            File saveFile = new File(absolutePath);
+            if (!saveFile.exists()) {
+                File pFile = saveFile.getParentFile();
+                if (!pFile.exists()) {
+                    pFile.mkdirs();
+                }
+                saveFile.createNewFile();
+            }
+            file.transferTo(saveFile);
         } catch (IOException e) {
             log.error("上传文件失败", e);
             ResponseEnum.SYSTEM_ERROR.throwEx("文件上传失败!", e);
