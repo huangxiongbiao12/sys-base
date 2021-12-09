@@ -1,11 +1,14 @@
 package com.rm.common.jooq;
 
+import com.rm.common.utils.CollectionUtils;
 import com.rm.common.utils.ReflectUtil;
 import com.rm.common.web.response.ResponseEnum;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -22,7 +25,7 @@ public class ConditionUtils {
      */
     public static SelectConditionStep parseMap(DSLContext dslContext, Map map, Table t) {
         StringBuilder sqlBuilder = new StringBuilder();
-        OrderField orderField = null;
+        List<OrderField> orderFields = new ArrayList<>();
         if (map != null) {
             Set<String> keys = map.keySet();
             String orderKey = null;
@@ -37,12 +40,24 @@ public class ConditionUtils {
                 String[] cons = key.split(SPILT);
                 if (cons.length >= 1 && map.get(key) != null && StringUtils.hasLength(map.get(key).toString())) {
                     sqlBuilder.append("`" + cons[0] + "`");
+                    boolean isIn = false;
                     if (cons.length >= 2) {
                         sqlBuilder.append(Compare.getValue(cons[1]));
+                        isIn = Compare.IN.getCode().equals(cons[1]);
                     } else {
                         sqlBuilder.append(Compare.EQ.getValue());
                     }
-                    sqlBuilder.append("'" + map.get(key) + "' and ");
+                    if (isIn) {
+                        String[] values = map.get(key).toString().split(",");
+                        sqlBuilder.append("(");
+                        for (String value : values) {
+                            sqlBuilder.append("'" + value + "', ");
+                        }
+                        sqlBuilder.replace(sqlBuilder.length() - 2, sqlBuilder.length() - 1, "");
+                        sqlBuilder.append(") and ");
+                    } else {
+                        sqlBuilder.append("'" + map.get(key) + "' and ");
+                    }
                 }
             }
             if (sqlBuilder.length() > 5) {
@@ -50,12 +65,19 @@ public class ConditionUtils {
             }
 //        // order- 开头加字段名排序  1 升序 0 降序
             if (StringUtils.hasLength(orderKey)) {
-                String asc = map.get(orderKey).toString();
-                TableField tableField = ReflectUtil.getValueByField(orderKey.split(SPILT)[1].toUpperCase(), t);
-                if (asc.equals("1")) {
-                    orderField = tableField.asc();
-                } else {
-                    orderField = tableField.desc();
+                String[] ascs = map.get(orderKey).toString().split(",");
+                String[] orders = orderKey.replace(ORDER, "").split(",");
+                for (int i = 0; i < orders.length; i++) {
+                    String order = orders[i];
+                    String asc = ascs[i];
+                    TableField tableField = ReflectUtil.getValueByField(order.toUpperCase(), t);
+                    OrderField orderField = null;
+                    if (asc.equals("1")) {
+                        orderField = tableField.asc();
+                    } else {
+                        orderField = tableField.desc();
+                    }
+                    orderFields.add(orderField);
                 }
             }
         }
@@ -63,8 +85,8 @@ public class ConditionUtils {
             sqlBuilder.append(" 1 = 1 ");
         }
         SelectConditionStep selectConditionStep = dslContext.select().from(t).where(DSL.condition(sqlBuilder.toString()));
-        if (orderField != null) {
-            selectConditionStep.orderBy(orderField);
+        if (CollectionUtils.notEmpty(orderFields)) {
+            selectConditionStep.orderBy(orderFields);
         }
         return selectConditionStep;
     }

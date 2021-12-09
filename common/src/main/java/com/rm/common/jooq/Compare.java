@@ -6,6 +6,7 @@ import lombok.Getter;
 public enum Compare {
 
     EQ("eq", " = "),
+    IN("in", " in "),
     NOT_EQ("ne", " != "),
     GE("ge", " >= "),
     LE("le", " <= "),
