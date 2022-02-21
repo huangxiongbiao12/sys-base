@@ -33,7 +33,8 @@ public class AuthInterceptor extends HandlerInterceptorAdapter {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        if (!rmSecurityProperties.isEnable()) {
+        String path = request.getRequestURI();
+        if (!rmSecurityProperties.isEnable() || checkDisauth(path)) {
             return true;
         }
         if (handler instanceof HandlerMethod) {
@@ -53,11 +54,9 @@ public class AuthInterceptor extends HandlerInterceptorAdapter {
                 return true;
             }
             //解析token登陆状态
-            String path = request.getContextPath();
             //如果标注了Disauth或者配置文件disauth中存在path，则直接返回成功
             if (method.getDeclaringClass().getAnnotation(Disauth.class) != null
-                    || method.getAnnotation(Disauth.class) != null
-                    || checkDisauth(path)) {
+                    || method.getAnnotation(Disauth.class) != null) {
                 return true;
             }
             Token token = tokenManager.parse(request.getHeader(Token.HEADER_TOKEN));
