@@ -3,8 +3,11 @@ spring:
         driver-class-name: com.mysql.cj.jdbc.Driver
         url: jdbc:mysql://localhost:3306/sys_base?useSSL=false&serverTimezone=GMT%2B8&characterEncoding=UTF8
         username: root
-        password: 11111111
+        password: h626551861
 rm:
+    security:
+        disauth: /swagger-ui/*
+#        enable: false
     generator:
         basePackage: com.rm.manager
         jooqPackage: com.rm.manager.jooq
@@ -12,3 +15,6 @@ rm:
 #        password: medishare2019
 #        url: jdbc:mysql://106.12.3.68:3306/dongbang?useSSL=false&serverTimezone=GMT%2B8&characterEncoding=UTF8
 #        username: medi
+springfox:
+    documentation:
+        enabled: true
