@@ -1,6 +1,7 @@
 package com.rm.common.service.impl;
 
 import com.rm.common.jooq.BasicDao;
+import com.rm.common.jooq.BasicEntity;
 import com.rm.common.jooq.Paging;
 import com.rm.common.service.BaseService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,15 +13,16 @@ import java.util.Map;
  * @param <P>   数据库实体
  * @param <DAO> 数据库dao
  */
-public abstract class BaseServiceImpl<P, DAO extends BasicDao> implements BaseService<P> {
+public abstract class BaseServiceImpl<P extends BasicEntity, DAO extends BasicDao> implements BaseService<P> {
 
     @Autowired
     protected DAO dao;
 
 
     @Override
-    public void insert(P p) {
+    public String insert(P p) {
         dao.insert(p);
+        return p.getId();
     }
 
     @Override
