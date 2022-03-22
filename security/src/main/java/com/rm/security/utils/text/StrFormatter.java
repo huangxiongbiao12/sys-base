@@ -1,6 +1,8 @@
 package com.rm.security.utils.text;
 
 
+import com.rm.security.utils.StringUtils;
+
 /**
  * 字符串格式化
  * 

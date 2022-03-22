@@ -1,5 +1,6 @@
 package com.rm.security.utils.text;
 
+import com.rm.security.utils.StringUtils;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.math.BigDecimal;

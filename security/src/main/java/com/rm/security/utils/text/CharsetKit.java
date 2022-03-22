@@ -1,5 +1,7 @@
 package com.rm.security.utils.text;
 
+import com.rm.security.utils.StringUtils;
+
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
