@@ -53,7 +53,8 @@ public class ResponseHandler implements ResponseBodyAdvice<Object> {
                 ((ServletServerHttpResponse) serverHttpResponse)
                         .getServletResponse().getStatus())
                 || object instanceof Result || object instanceof Resource
-                || serverHttpRequest.getURI().getPath().contains(EruptRestPath.ERUPT_API)) {
+                || serverHttpRequest.getURI().getPath().contains(EruptRestPath.ERUPT_API)
+                || serverHttpRequest.getURI().getPath().contains("/magic/web")) {
             return object;
         }
 

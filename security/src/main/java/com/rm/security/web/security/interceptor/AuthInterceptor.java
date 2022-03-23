@@ -31,12 +31,15 @@ public class AuthInterceptor extends HandlerInterceptorAdapter {
     @Autowired
     private RmSecurityProperties rmSecurityProperties;
 
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         String path = request.getRequestURI();
-        if (!rmSecurityProperties.isEnable() || checkDisauth(path) || path.contains(EruptRestPath.ERUPT_API)) {
-            return true;
-        }
+//        String dispatchPath = path.replace(request.getContextPath(), "");
+//        if (!rmSecurityProperties.isEnable() || checkDisauth(path)
+//                || path.contains(EruptRestPath.ERUPT_API) || "/".equals(dispatchPath) || dispatchPath.contains(".html")) {
+//            return true;
+//        }
         if (handler instanceof HandlerMethod) {
             response.setHeader("Access-Control-Allow-Origin", "*");
             response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");
