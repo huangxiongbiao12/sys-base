@@ -43,7 +43,7 @@ public class WebConfigration extends WebMvcConfigurerAdapter {
                     .addPathPatterns("/**")
                     .excludePathPatterns(rmSecurityProperties.getDisauth())
                     .excludePathPatterns(EruptRestPath.ERUPT_API + "/**", "/")
-                    .excludePathPatterns("/assets/**", "/**/*.js", "/**/*.css", "/**/*.html", "/**/*.svg", "/**/*.png", "/**/*.jpg", "/magic/web/**", "/error", "/**/element/**");
+                    .excludePathPatterns("/assets/**", "/**/*.json", "/**/*.js", "/**/*.css", "/**/*.html", "/**/*.svg", "/**/*.png", "/**/*.jpg", "/magic/web/**", "/error", "/**/element/**");
         }
         super.addInterceptors(registry);
     }
