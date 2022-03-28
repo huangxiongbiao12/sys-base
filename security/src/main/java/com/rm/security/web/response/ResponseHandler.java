@@ -5,6 +5,7 @@ import com.rm.security.constant.EruptRestPath;
 import com.rm.security.web.exception.ResponseException;
 import com.rm.security.web.exception.TokenException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
@@ -39,6 +40,9 @@ public class ResponseHandler implements ResponseBodyAdvice<Object> {
     private static final Pattern SWAGGER_PATTERN = Pattern.compile(
             "(?:^springfox\\.|io\\.swagger\\.).*");
 
+    @Value("${rm.originResult:prometheus}")
+    String originResult;
+
     @Override
     public boolean supports(MethodParameter methodParameter, Class<? extends HttpMessageConverter<?>> aClass) {
         return true;
@@ -54,7 +58,9 @@ public class ResponseHandler implements ResponseBodyAdvice<Object> {
                         .getServletResponse().getStatus())
                 || object instanceof Result || object instanceof Resource
                 || serverHttpRequest.getURI().getPath().contains(EruptRestPath.ERUPT_API)
-                || serverHttpRequest.getURI().getPath().contains("/magic/web")) {
+                || serverHttpRequest.getURI().getPath().contains("/magic/web")
+                || serverHttpRequest.getURI().getPath().contains(".json")
+                || serverHttpRequest.getURI().getPath().contains(originResult)) {
             return object;
         }
 
