@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.rm.common.web.exception.ResponseException;
 import com.rm.common.web.exception.TokenException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
@@ -38,6 +39,9 @@ public class ResponseHandler implements ResponseBodyAdvice<Object> {
     private static final Pattern SWAGGER_PATTERN = Pattern.compile(
             "(?:^springfox\\.|io\\.swagger\\.).*");
 
+    @Value("${rm.originResult:prometheus}")
+    String originResult;
+
     @Override
     public boolean supports(MethodParameter methodParameter, Class<? extends HttpMessageConverter<?>> aClass) {
         return true;
@@ -51,7 +55,8 @@ public class ResponseHandler implements ResponseBodyAdvice<Object> {
         if ((HttpStatus.OK.value() !=
                 ((ServletServerHttpResponse) serverHttpResponse)
                         .getServletResponse().getStatus())
-                || object instanceof Result || object instanceof Resource) {
+                || object instanceof Result || object instanceof Resource
+                || serverHttpRequest.getURI().getPath().contains(originResult)) {
             return object;
         }
 

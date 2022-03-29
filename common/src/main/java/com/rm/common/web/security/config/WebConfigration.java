@@ -25,7 +25,7 @@ import java.time.format.DateTimeFormatter;
 public class WebConfigration extends WebMvcConfigurerAdapter {
 
     /**
-     *  返回LocalDateTime值（去掉LocalDateTime中的T）
+     * 返回LocalDateTime值（去掉LocalDateTime中的T）
      */
     @Value("${spring.jackson.date-format:yyyy-MM-dd HH:mm:ss}")
     private String pattern;
@@ -38,7 +38,8 @@ public class WebConfigration extends WebMvcConfigurerAdapter {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         if (rmSecurityProperties.isEnable()) {
-            registry.addInterceptor(authInterceptor).addPathPatterns("/**");
+            registry.addInterceptor(authInterceptor).addPathPatterns("/**")
+                    .excludePathPatterns(rmSecurityProperties.getDisauth());
         }
         super.addInterceptors(registry);
     }
@@ -59,6 +60,7 @@ public class WebConfigration extends WebMvcConfigurerAdapter {
 
     /**
      * 接收前端datetime参数
+     *
      * @return
      */
     @Bean
@@ -75,7 +77,7 @@ public class WebConfigration extends WebMvcConfigurerAdapter {
                 DateTimeFormatter df = DateTimeFormatter.ofPattern(pattern);
                 LocalDateTime date = null;
                 try {
-                    date = LocalDateTime.parse((String) source,df);
+                    date = LocalDateTime.parse((String) source, df);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -93,7 +95,6 @@ public class WebConfigration extends WebMvcConfigurerAdapter {
     public Jackson2ObjectMapperBuilderCustomizer jackson2ObjectMapperBuilderCustomizer() {
         return builder -> builder.serializerByType(LocalDateTime.class, localDateTimeDeserializer());
     }
-
 
 
 }
