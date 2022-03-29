@@ -10,7 +10,9 @@ import java.util.Map;
  */
 public interface BaseService<P> {
 
-    String insert(P p);
+    void insert(P p);
+
+    String insertReturnId(P p);
 
     void update(P p);
 

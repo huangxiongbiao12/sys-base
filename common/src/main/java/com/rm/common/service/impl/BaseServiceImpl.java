@@ -18,9 +18,13 @@ public abstract class BaseServiceImpl<P extends BasicEntity, DAO extends BasicDa
     @Autowired
     protected DAO dao;
 
+    @Override
+    public void insert(P p) {
+        dao.insert(p);
+    }
 
     @Override
-    public String insert(P p) {
+    public String insertReturnId(P p) {
         dao.insert(p);
         return p.getId();
     }
