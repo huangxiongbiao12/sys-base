@@ -1,0 +1,140 @@
+package $!{controllerPackage};
+
+import $!{entityPackage}.$!{domainName}Entity;
+import $!{servicePackage}.$!{domainName}Service;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestBody;
+import com.rm.generator.web.response.ResponseEnum;
+import javax.servlet.http.HttpServletResponse;
+import java.net.URLEncoder;
+import com.alibaba.excel.EasyExcel;
+import com.alibaba.excel.write.style.column.LongestMatchColumnWidthStyleStrategy;
+import com.rm.generator.utils.DateUtils;
+
+import com.rm.generator.jooq.Paging;
+import com.rm.generator.web.response.Page;
+import java.util.Map;
+import java.util.List;
+
+@RestController
+@RequestMapping("$!{mapping}")
+public class $!{domainName}Controller {
+
+    @Autowired
+    $!{domainName}Service $!{attrName}Service;
+
+
+    /**
+     * 单表保存，会自动生成id，保存时间，建表时设置当前时间
+     *
+     * @param entity
+     */
+    @RequestMapping("save")
+    public void save($!{domainName}Entity entity) {
+        $!{attrName}Service.insert(entity);
+    }
+
+    /**
+     * 根据id 删除数据
+     *
+     * @param id
+     */
+    @RequestMapping("delete")
+    public void deleteById(String id) {
+        $!{attrName}Service.deleteById(id);
+    }
+
+    /**
+     * 根据id修改数据
+     *
+     * @param entity
+     */
+    @RequestMapping("update")
+    public void update($!{domainName}Entity entity) {
+        $!{attrName}Service.update(entity);
+    }
+
+    /**
+     * 根据id 获取数据
+     *
+     * @param id
+     * @return
+     */
+    @RequestMapping("get-by-id")
+    public $!{domainName}Entity getById(String id) {
+        return $!{attrName}Service.getById(id);
+    }
+
+    /**
+     * 查询所有数据
+     *
+     * @return
+     */
+    @RequestMapping("list")
+    public List<$!{domainName}Entity> list() {
+        return $!{attrName}Service.getAll();
+    }
+
+    /**
+     * 分页条件查询
+     * <p>  支持的 查询条件说明
+     * EQ("eq", " = "),
+     * NOT_EQ("ne", " != "),
+     * GE("ge", " >= "),
+     * LE("le", " <= "),
+     * GT("gt", " > "),
+     * LT("lt", " < "),
+     * LIKE("like", " LIKE "),
+     *
+     * @param map  key为表字段，默认以等于条件查询 where key=value，
+     *             其他简单条件查询使用 字段名-条件（）  会在where后面是有字段当条件查询
+     *             例如： key: a-like value: nihao   sql：where `a` like 'nihao'
+                    排序： order- 开头加字段名排序  1 升序 0 降序
+                                            key：order-a value: 1  sql  order by a asc
+     * @param page
+     * @return
+     */
+    @RequestMapping("list-condition-page")
+    public Paging<$!{domainName}Entity> listConditionPage(@RequestBody Map map, Page page) {
+        Paging<$!{domainName}Entity> paging = new Paging<>(page.getPage(), page.getSize());
+        $!{attrName}Service.listConditionPage(map, paging);
+        return paging;
+    }
+
+    /**
+     * 根据条件导出excel
+     * 生成导出实体说明：
+     * 需要在表的备注内写 excel 标注为生成excel导出接口。
+     * 导出表格的格式：
+     * 字段注释内含有excel标注，会以注释第一行替换掉excel为 excel表头导出 字段顺序为excel顺序
+     * 未标注excel注释的 不会作为导出字段导出
+     *
+     * @param response
+     * @param map      map参数和上面分页条件查询一样
+     *
+     */
+    @RequestMapping("export")
+    public void export(HttpServletResponse response, @RequestBody Map map) {
+        // 这里注意 有同学反应使用swagger 会导致各种问题，请直接用浏览器或者用postman
+        try {
+            response.setContentType("application/vnd.ms-excel");
+            response.setCharacterEncoding("utf-8");
+            // 这里URLEncoder.encode可以防止中文乱码 当然和easyexcel没有关系
+            String fileName = URLEncoder.encode("$!{fileName}" + DateUtils.currentTime("yyyyMMddhhmm"), "UTF-8").replaceAll("\\+", "%20");
+            response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName + ".xlsx");
+            // 这里需要设置不关闭流,根据map条件查询导出数据
+            List<$!{domainName}Entity> dataList = $!{attrName}Service.listConditionPage(map, null);
+            EasyExcel.write(response.getOutputStream(), $!{domainName}Entity.class).registerWriteHandler(new LongestMatchColumnWidthStyleStrategy()).autoCloseStream(Boolean.FALSE).sheet(fileName)
+                    .doWrite(dataList);
+        } catch (Exception e) {
+            // 重置response
+            response.reset();
+            response.setContentType("application/json");
+            response.setCharacterEncoding("utf-8");
+            throw ResponseEnum.SYSTEM_ERROR.throwEx("导出文件失败!", e);
+        }
+    }
+
+}

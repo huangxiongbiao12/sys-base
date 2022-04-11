@@ -1,0 +1,24 @@
+package $!{daoPackage};
+
+import com.rm.generator.jooq.BasicDao;
+import org.springframework.stereotype.Repository;
+import $!{entityPackage}.$!{domainName}Entity;
+import $!{jooqPackage}.tables.$!{domainName};
+import $!{jooqPackage}.tables.records.$!{domainName}Record;
+
+/**
+*
+*   $!{tableRemake}
+*
+*/
+@Repository
+public class $!{domainName}Dao extends BasicDao<$!{domainName}Record, $!{domainName}Entity, $!{domainName}> {
+
+    @Autowired
+    $!{domainName}Repository $!{attrName}Repository;
+
+    protected $!{domainName}Dao() {
+        super($!{domainName}.$!{upperDomainName}, $!{domainName}Entity.class);
+    }
+
+}

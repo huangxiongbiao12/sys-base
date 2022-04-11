@@ -1,0 +1,53 @@
+package $!{servicePackage}.impl;
+
+import $!{daoPackage}.$!{domainName}Dao;
+import $!{entityPackage}.$!{domainName}Entity;
+import com.rm.generator.service.impl.BaseServiceImpl;
+import $!{servicePackage}.$!{domainName}Service;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Map;
+import com.rm.generator.jooq.Paging;
+
+
+
+/**
+ *
+ *   $!{tableRemake}
+ *
+ */
+@Service
+public class $!{domainName}ServiceImpl extends BaseServiceImpl<$!{domainName}Entity, $!{domainName}Dao> implements $!{domainName}Service {
+
+    @Override
+    public void insert($!{domainName}Entity entity) {
+        dao.insert(entity);
+    }
+
+    @Override
+    public void update($!{domainName}Entity entity) {
+        dao.update(entity);
+    }
+
+    @Override
+    public void deleteById(String id) {
+        dao.deleteById(id);
+    }
+
+    @Override
+    public $!{domainName}Entity getById(String id) {
+        return dao.findById(id);
+    }
+
+    @Override
+    public List<$!{domainName}Entity> getAll() {
+        return dao.findAll();
+    }
+
+    @Override
+    public List<$!{domainName}Entity> listConditionPage(Map map, Paging paging) {
+        return dao.listConditionPage(map, paging);
+    }
+
+}

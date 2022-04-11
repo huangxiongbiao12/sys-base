@@ -1,0 +1,14 @@
+package $!{daoPackage}.repository;
+
+import $!{entityPackage}.$!{domainName}Entity;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+/**
+ * 直接继承 JpaRepository 就有了增删改查等能力，该功能由 spring-data-jpa 提供
+ * 泛型说明: 实体类对象  String 主键数据类型
+ *
+ * @author sys
+ */
+public interface $!{domainName}Repository extends JpaRepository<$!{domainName}Entity, String> {
+
+}
