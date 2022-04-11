@@ -1,5 +1,6 @@
 package com.rm.generator.generator.annotation;
 
+import com.rm.generator.erupt.BaseEntityDataProxy;
 import com.rm.generator.generator.GeneratorConfigration;
 import com.rm.generator.generator.GeneratorProperties;
 import org.springframework.context.annotation.Import;
@@ -11,7 +12,7 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-@Import({GeneratorConfigration.class, GeneratorProperties.class})
+@Import({GeneratorConfigration.class, GeneratorProperties.class, BaseEntityDataProxy.class})
 public @interface EnableCodeGenerate {
 
 }

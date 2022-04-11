@@ -35,6 +35,8 @@ public class GeneratorProperties {
     private String jooqPackage; //默认在base后加jooq  未设置时
     /*去除前缀*/
     private String prefix[] = null;
+    /*按前缀排除某些表不生成*/
+    private String prefixExclude[] = null;
     /*代码生成范围 默认全部*/
     private Type[] type = new Type[]{Type.ALL};
     // 时间使用类型 默认 LocalDateTime
@@ -126,5 +128,13 @@ public class GeneratorProperties {
 
     public void setJooqPackage(String jooqPackage) {
         this.jooqPackage = jooqPackage;
+    }
+
+    public String[] getPrefixExclude() {
+        return prefixExclude;
+    }
+
+    public void setPrefixExclude(String[] prefixExclude) {
+        this.prefixExclude = prefixExclude;
     }
 }

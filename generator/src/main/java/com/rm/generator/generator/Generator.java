@@ -30,6 +30,7 @@ public class Generator {
     private static String serviceImplPackage;
     private static String controllerPackage;
     private static String[] prefix;
+    private static String prefixExclude[] = null;
     // 代码模板的位置
     static String templateDir = "/Users/apple/Desktop/code/github/sys-base/common/src/main/resources/template";
 
@@ -76,6 +77,7 @@ public class Generator {
         serviceImplPackage = servicePackage + ".impl";
         controllerPackage = basePackage + ".controller";
         prefix = generatorProperties.getPrefix();
+        prefixExclude = generatorProperties.getPrefixExclude();
         try {
             Properties props = new Properties();
 //            props.setProperty("user", dbUser);
@@ -139,6 +141,8 @@ public class Generator {
             while (resultSet.next()) {
                 //表名
                 String tableName = resultSet.getString("TABLE_NAME");
+                // 排除部分表
+                if (excludePrefix(tableName)) continue;
                 String tableRemake = resultSet.getString("REMARKS");
                 boolean isExport = tableRemake.contains(EXCEL_FLAG);
                 //字段信息集合
@@ -236,6 +240,8 @@ public class Generator {
             while (resultSet.next()) {
                 //表名
                 String tableName = resultSet.getString("TABLE_NAME");
+                // 排除部分表
+                if (excludePrefix(tableName)) continue;
                 String tableRemake = resultSet.getString("REMARKS");
                 String domainName = initialCap(tableName);
                 String upperDomainName = tableName.toUpperCase();
@@ -299,6 +305,8 @@ public class Generator {
             while (resultSet.next()) {
                 //表名
                 String tableName = resultSet.getString("TABLE_NAME");
+                // 排除部分表
+                if (excludePrefix(tableName)) continue;
                 String tableRemake = resultSet.getString("REMARKS");
                 String domainName = initialCap(tableName);
                 String upperDomainName = tableName.toUpperCase();
@@ -362,6 +370,8 @@ public class Generator {
             while (resultSet.next()) {
                 //表名
                 String tableName = resultSet.getString("TABLE_NAME");
+                // 排除部分表
+                if (excludePrefix(tableName)) continue;
                 String tableRemake = resultSet.getString("REMARKS");
                 String domainName = initialCap(tableName);
                 String servicePackage = Generator.servicePackage;
@@ -422,6 +432,8 @@ public class Generator {
             while (resultSet.next()) {
                 //表名
                 String tableName = resultSet.getString("TABLE_NAME");
+                // 排除部分表
+                if (excludePrefix(tableName)) continue;
                 String tableRemake = resultSet.getString("REMARKS");
                 String domainName = initialCap(tableName);
                 String servicePackage = Generator.servicePackage;
@@ -482,6 +494,8 @@ public class Generator {
             while (resultSet.next()) {
                 //表名
                 String tableName = resultSet.getString("TABLE_NAME");
+                // 排除部分表
+                if (excludePrefix(tableName)) continue;
                 String tableRemake = resultSet.getString("REMARKS");
                 String domainName = initialCap(tableName);
                 String servicePackage = Generator.servicePackage;
@@ -673,6 +687,20 @@ public class Generator {
         contentBuffer.append("\t\treturn " + attrName + ";\r\n");
         contentBuffer.append("\t}\r\n\r\n");
         return contentBuffer;
+    }
+
+    /**
+     * 排除某些表不生成
+     *
+     * @return
+     */
+    private static boolean excludePrefix(String tableName) {
+        if (prefixExclude != null && prefixExclude.length > 1) {
+            for (String pre : prefixExclude) {
+                return tableName.startsWith(pre);
+            }
+        }
+        return false;
     }
 
     /**
