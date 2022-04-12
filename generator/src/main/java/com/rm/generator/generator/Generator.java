@@ -24,6 +24,7 @@ public class Generator {
     private static String sourcePath;
     private static String basePackage;
     private static String jooqPackage;
+    private static String modelPackage;
     private static String entityPackage;
     private static String daoPackage;
     private static String servicePackage;
@@ -45,7 +46,7 @@ public class Generator {
 
     // 时间包
     private static final String IMPORT_DATE = "import java.util.Date;\r\nimport com.alibaba.excel.annotation.format.DateTimeFormat;\r\n";
-    private static final String IMPORT_LOCALDATETIME = "import java.time.LocalDateTime;\r\nimport com.rm.generator.utils.excel.LocalDateTimeConverter;\r\n";
+    private static final String IMPORT_LOCALDATETIME = "import java.time.LocalDateTime;\r\nimport com.rm.generator.excel.LocalDateTimeConverter;\r\n";
     private static final String IMPORT_BASEENTITY = "import com.rm.generator.jooq.BasicEntity;\r\n";
     private static final String IMPORT_DATA = "import lombok.Data;\r\n";
     private static final String IMPORT_EXCEL = "import com.alibaba.excel.annotation.ExcelIgnore;\r\n" +
@@ -72,6 +73,7 @@ public class Generator {
             jooqPackage = basePackage + ".jooq";
         }
         entityPackage = basePackage + ".entity";
+        modelPackage = entityPackage + ".model";
         daoPackage = basePackage + ".dao";
         servicePackage = basePackage + ".service";
         serviceImplPackage = servicePackage + ".impl";
@@ -101,6 +103,7 @@ public class Generator {
         GeneratorProperties.Type[] types = generatorProperties.getType();
         for (GeneratorProperties.Type type : types) {
             if (type == GeneratorProperties.Type.ALL) {
+                generateModel();
                 generateEntity();
                 generateRepository();
                 generateDAO();
@@ -134,7 +137,7 @@ public class Generator {
     /**
      * 生成实体类
      */
-    private static void generateEntity() {
+    private static void generateModel() {
         try {
             resultSet.beforeFirst();
             //迭代所有的表
@@ -142,25 +145,33 @@ public class Generator {
                 //表名
                 String tableName = resultSet.getString("TABLE_NAME");
                 // 排除部分表
-                if (excludePrefix(tableName)) continue;
+                if (excludePrefix(tableName)) {
+                    continue;
+                }
                 String tableRemake = resultSet.getString("REMARKS");
                 boolean isExport = tableRemake.contains(EXCEL_FLAG);
                 //字段信息集合
                 ResultSet colrs = dbmd.getColumns(connection.getCatalog(), connection.getSchema(), tableName, "%");
                 //创建类文件
-                if (getEntitySavePath() == null) break;
-                String classFilePath = getEntitySavePath() + getEntityName(tableName) + ".java";
+                if (getModelSavePath() == null) break;
+                String classFilePath = getModelSavePath() + getModelName(tableName) + ".java";
+                File file = new File(classFilePath);
+                if (!file.exists()) {
+                    file.createNewFile();
+                } else {
+                    continue;
+                }
                 //文件输出流
                 FileWriter fw = new FileWriter(classFilePath);
                 PrintWriter pw = new PrintWriter(fw);
                 //先写package import文本
                 StringBuffer fileBuffer = new StringBuffer();
-                if (entityPackage != null && !entityPackage.equals(""))
-                    fileBuffer.append("package " + entityPackage + ";\r\n\n");
+                if (modelPackage != null && !modelPackage.equals(""))
+                    fileBuffer.append("package " + modelPackage + ";\r\n\n");
                 fileBuffer.append("import java.io.Serializable;" + "\r\n");
-                fileBuffer.append("lombok.Getter;" + "\r\n");
-                fileBuffer.append("lombok.Setter;" + "\r\n");
-                fileBuffer.append("javax.persistence.*;" + "\r\n");
+                fileBuffer.append("import lombok.Getter;" + "\r\n");
+                fileBuffer.append("import lombok.Setter;" + "\r\n");
+                fileBuffer.append("import javax.persistence.*;" + "\r\n");
                 fileBuffer.append(IMPORT_BASEENTITY);
 //                fileBuffer.append(IMPORT_DATA);
                 // 导出excel注解引入
@@ -176,16 +187,17 @@ public class Generator {
                 contentBuffer.append(" *\t" + tableRemake + "\r\n");
                 contentBuffer.append(" */\r\n");
 //                contentBuffer.append("@Data\r\n");
-                contentBuffer.append("@Table(name = \"" + tableName + "\")\r\n");
-                contentBuffer.append("@Entity\r\n");
+//                contentBuffer.append("@Table(name = \"" + tableName + "\")\r\n");
+//                contentBuffer.append("@Entity\r\n");
                 contentBuffer.append("@Setter\r\n");
                 contentBuffer.append("@Getter\r\n");
+                contentBuffer.append("@MappedSuperclass\r\n");
 
                 if (isExport) {
                     contentBuffer.append("@HeadFontStyle(fontHeightInPoints = 12)\r\n");
                     contentBuffer.append("@ContentFontStyle(fontHeightInPoints = 11)\r\n");
                 }
-                contentBuffer.append("public class " + getEntityName(tableName) + " extends BasicEntity implements Serializable" + "{\r\n");
+                contentBuffer.append("public class " + getModelName(tableName) + " extends BasicEntity implements Serializable" + "{\r\n");
                 //属性文本
                 StringBuffer attrBuffer = new StringBuffer();
                 //方法文本
@@ -231,6 +243,74 @@ public class Generator {
     }
 
     /**
+     * 生成entity
+     */
+    private static void generateEntity() {
+        try {
+            resultSet.beforeFirst();
+            //迭代所有的表  daoPackage tableRemake domainName upperDomainName
+            while (resultSet.next()) {
+                //表名
+                String tableName = resultSet.getString("TABLE_NAME");
+                // 排除部分表
+                if (excludePrefix(tableName)) {
+                    continue;
+                }
+                String tableRemake = resultSet.getString("REMARKS");
+                String domainName = initialCap(tableName);
+                String upperDomainName = tableName.toUpperCase();
+                String daoPackage = Generator.daoPackage;
+                //创建mapper文件
+                if (getEntitySavePath() == null) break;
+                String targetFile = getEntitySavePath() + domainName + "Entity.java";
+
+                Properties pro = new Properties();
+                pro.setProperty(Velocity.OUTPUT_ENCODING, "UTF-8");
+                pro.setProperty(Velocity.INPUT_ENCODING, "UTF-8");
+                pro.setProperty(Velocity.RESOURCE_LOADER, "class");
+                //可选值："class"--从classpath中读取，"file"--从文件系统中读取
+                pro.setProperty(Velocity.RESOURCE_LOADER, "class");
+                //如果从文件系统中读取模板，那么属性值为org.apache.velocity.runtime.resource.loader.FileResourceLoader
+                pro.setProperty("class.resource.loader.class", "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
+                VelocityEngine ve = new VelocityEngine(pro);
+
+                VelocityContext context = new VelocityContext();
+                context.put("tableName", tableName);
+                context.put("daoPackage", daoPackage);
+                context.put("entityPackage", entityPackage);
+                context.put("tableRemake", tableRemake);
+                context.put("domainName", domainName);
+                context.put("upperDomainName", upperDomainName);
+                context.put("jooqPackage", jooqPackage);
+                Template t = ve.getTemplate("template/entity.template", "UTF-8");
+
+                File file = new File(targetFile);
+                if (!file.getParentFile().exists())
+                    file.getParentFile().mkdirs();
+                if (!file.exists()) {
+                    file.createNewFile();
+                } else {
+                    continue;
+                }
+
+                FileOutputStream outStream = new FileOutputStream(file);
+                OutputStreamWriter writer = new OutputStreamWriter(outStream,
+                        "UTF-8");
+                BufferedWriter sw = new BufferedWriter(writer);
+                t.merge(context, sw);
+                sw.flush();
+                sw.close();
+                outStream.close();
+                System.out.println("成功生成Java文件:" + (targetFile).replaceAll("/", "\\\\"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
      * 生成Repository
      */
     private static void generateRepository() {
@@ -241,7 +321,9 @@ public class Generator {
                 //表名
                 String tableName = resultSet.getString("TABLE_NAME");
                 // 排除部分表
-                if (excludePrefix(tableName)) continue;
+                if (excludePrefix(tableName)) {
+                    continue;
+                }
                 String tableRemake = resultSet.getString("REMARKS");
                 String domainName = initialCap(tableName);
                 String upperDomainName = tableName.toUpperCase();
@@ -306,7 +388,9 @@ public class Generator {
                 //表名
                 String tableName = resultSet.getString("TABLE_NAME");
                 // 排除部分表
-                if (excludePrefix(tableName)) continue;
+                if (excludePrefix(tableName)) {
+                    continue;
+                }
                 String tableRemake = resultSet.getString("REMARKS");
                 String domainName = initialCap(tableName);
                 String upperDomainName = tableName.toUpperCase();
@@ -371,7 +455,9 @@ public class Generator {
                 //表名
                 String tableName = resultSet.getString("TABLE_NAME");
                 // 排除部分表
-                if (excludePrefix(tableName)) continue;
+                if (excludePrefix(tableName)) {
+                    continue;
+                }
                 String tableRemake = resultSet.getString("REMARKS");
                 String domainName = initialCap(tableName);
                 String servicePackage = Generator.servicePackage;
@@ -433,7 +519,9 @@ public class Generator {
                 //表名
                 String tableName = resultSet.getString("TABLE_NAME");
                 // 排除部分表
-                if (excludePrefix(tableName)) continue;
+                if (excludePrefix(tableName)) {
+                    continue;
+                }
                 String tableRemake = resultSet.getString("REMARKS");
                 String domainName = initialCap(tableName);
                 String servicePackage = Generator.servicePackage;
@@ -495,7 +583,9 @@ public class Generator {
                 //表名
                 String tableName = resultSet.getString("TABLE_NAME");
                 // 排除部分表
-                if (excludePrefix(tableName)) continue;
+                if (excludePrefix(tableName)) {
+                    continue;
+                }
                 String tableRemake = resultSet.getString("REMARKS");
                 String domainName = initialCap(tableName);
                 String servicePackage = Generator.servicePackage;
@@ -559,6 +649,9 @@ public class Generator {
         }
     }
 
+    private static String getModelSavePath() {
+        return getSavePath(modelPackage);
+    }
 
     private static String getEntitySavePath() {
         return getSavePath(entityPackage);
@@ -627,6 +720,13 @@ public class Generator {
      */
     private static StringBuffer addField(boolean isExport, StringBuffer contentBuffer, ResultSet resultSet) throws SQLException {
         if (contentBuffer == null || resultSet == null) return contentBuffer;
+        // 列名
+        String column = resultSet.getString("COLUMN_NAME");
+        String typeName = resultSet.getString("TYPE_NAME");
+        String columnSize = resultSet.getString("COLUMN_SIZE");
+//        if (column.equalsIgnoreCase("id") || column.equalsIgnoreCase("create_date")) {
+//            return contentBuffer;
+//        }
         //先写注释
         String remarks = resultSet.getString("REMARKS");
         contentBuffer.append("\r\n");
@@ -655,9 +755,20 @@ public class Generator {
                 contentBuffer.append("\t@ExcelIgnore\r\n");
             }
         }
+        //写jpa注解
+        if (typeName.equalsIgnoreCase("longtext") ||
+                typeName.equalsIgnoreCase("text") ||
+                typeName.equalsIgnoreCase("datetime") ||
+                typeName.equalsIgnoreCase("timestamp") ||
+                typeName.equalsIgnoreCase("image") ||
+                Integer.parseInt(columnSize) > 10000) {
+            contentBuffer.append("\t@Column(name = \"" + column + "\", columnDefinition = \"" + typeName + " comment '" + remarks + "'\")\r\n");
+        } else {
+            contentBuffer.append("\t@Column(name = \"" + column + "\", columnDefinition = \"" + typeName + "(" + columnSize + ") comment '" + remarks + "'\")\r\n");
+        }
         //写属性
-        contentBuffer.append("\tprivate " + sqlType2JavaType(resultSet.getString("TYPE_NAME")) + " "
-                + columnName2AttrName(resultSet.getString("COLUMN_NAME")) + ";\r\n");
+        contentBuffer.append("\tprivate " + sqlType2JavaType(typeName) + " "
+                + columnName2AttrName(column) + ";\r\n");
 
         return contentBuffer;
     }
@@ -695,7 +806,7 @@ public class Generator {
      * @return
      */
     private static boolean excludePrefix(String tableName) {
-        if (prefixExclude != null && prefixExclude.length > 1) {
+        if (prefixExclude != null && prefixExclude.length > 0) {
             for (String pre : prefixExclude) {
                 return tableName.startsWith(pre);
             }
@@ -726,8 +837,8 @@ public class Generator {
      * @param tableName
      * @return
      */
-    private static String getEntityName(String tableName) {
-        return initialCap(tableName) + "Entity";
+    private static String getModelName(String tableName) {
+        return initialCap(tableName) + "Model";
     }
 
     /**
@@ -824,6 +935,7 @@ public class Generator {
         } else if (sqlType.equalsIgnoreCase("varchar") || sqlType.equalsIgnoreCase("char")
                 || sqlType.equalsIgnoreCase("nvarchar") || sqlType.equalsIgnoreCase("nchar")
                 || sqlType.equalsIgnoreCase("text")
+                || sqlType.equalsIgnoreCase("longtext")
                 || sqlType.equalsIgnoreCase("json")) {
             return "String";
         } else if (sqlType.equalsIgnoreCase("datetime") || sqlType.equalsIgnoreCase("timestamp")

@@ -5,6 +5,9 @@ import org.springframework.stereotype.Repository;
 import $!{entityPackage}.$!{domainName}Entity;
 import $!{jooqPackage}.tables.$!{domainName};
 import $!{jooqPackage}.tables.records.$!{domainName}Record;
+import org.springframework.beans.factory.annotation.Autowired;
+import $!{daoPackage}.repository.$!{domainName}Repository;
+
 
 /**
 *

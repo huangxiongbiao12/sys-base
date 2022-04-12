@@ -1,0 +1,16 @@
+package $!{entityPackage};
+
+import lombok.*;
+import javax.persistence.*;
+import $!{entityPackage}.model.$!{domainName}Model;
+
+/**
+ * $!{tableRemake}
+ */
+ @Setter
+ @Getter
+ @Entity
+ @Table(name = "$!{tableName}")
+public class $!{domainName}Entity extends $!{domainName}Model {
+
+}

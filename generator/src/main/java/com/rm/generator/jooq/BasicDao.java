@@ -39,6 +39,7 @@ public class BasicDao<R extends UpdatableRecord<R>, P extends BasicEntity, Tab e
         if (StringUtils.isEmpty(object.getId())) {
             object.setId(SnowflakeIdWorker.generateId());
         }
+        object.setCreateDate(LocalDateTime.now());
         super.insert(object);
     }
 
